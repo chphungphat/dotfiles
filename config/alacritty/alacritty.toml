@@ -1,0 +1,72 @@
+# Terminal environment settings
+[env]
+# Using 'xterm-256color' ensures broad compatibility while supporting rich colors
+term = "xterm-256color"
+
+# Window settings for better visual experience
+[window]
+
+# Add some padding for better text visibility
+padding = { x = 5, y = 5 }
+
+# Round window corners
+decorations_theme_variant = "Dark"
+
+# Font configuration
+[font]
+size = 10.5
+
+[font.normal]
+family = "HackNerdFont"
+style = "Regular"
+
+[font.bold]
+style = "Bold"
+
+[font.italic]
+style = "Italic"
+
+[colors.primary]
+background = "#282828"
+foreground = "#ebdbb2"
+
+[colors.normal]
+black   = "#282828"
+red     = "#cc241d"
+green   = "#98971a"
+yellow  = "#d79921"
+blue    = "#458588"
+magenta = "#b16286"
+cyan    = "#689d6a"
+white   = "#a89984"
+
+[colors.bright]
+black   = "#928374"
+red     = "#fb4934"
+green   = "#b8bb26"
+yellow  = "#fabd2f"
+blue    = "#83a598"
+magenta = "#d3869b"
+cyan    = "#8ec07c"
+white   = "#ebdbb2"
+
+# Cursor settings
+[cursor]
+style = { shape = "Block", blinking = "On" }
+blink_interval = 750
+thickness = 0.15
+
+# Key bindings
+[keyboard]
+bindings = [
+    # Make Alt+backspace delete whole words
+    { key = "Back", mods = "Alt", chars = "\u001b\u007f" },
+    # Make Alt+left/right move between words
+    { key = "Left",  mods = "Alt", chars = "\u001b[1;5D" },
+    { key = "Right", mods = "Alt", chars = "\u001b[1;5C" }
+]
+
+# Scrolling behavior
+[scrolling]
+history = 10000
+multiplier = 3
