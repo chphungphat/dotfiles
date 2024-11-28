@@ -12,9 +12,14 @@ padding = { x = 5, y = 5 }
 # Round window corners
 decorations_theme_variant = "Dark"
 
+opacity = 1.0
+dynamic_padding = true
+# Reduces memory usage by optimizing the viewport
+option_as_alt = "Both"
+
 # Font configuration
 [font]
-size = 10.5
+size = 9.0
 
 [font.normal]
 family = "HackNerdFont"
@@ -70,3 +75,7 @@ bindings = [
 [scrolling]
 history = 10000
 multiplier = 3
+
+[selection]
+semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
+save_to_clipboard = true
