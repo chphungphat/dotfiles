@@ -123,7 +123,9 @@ export COLORTERM=truecolor
 
 export GIT_EDITOR=vim
 
-# ssh aliases
-alias ssd='ssh root@linode'
-alias ssmt='ssh root@mt-general'
-alias sssm='ssh root@sm-devs_1'
+DOCKER_SERVICES_SCRIPT="/home/reyon/.scripts/toggle-docker.sh"
+
+alias dstart='sudo $DOCKER_SERVICES_SCRIPT start'
+alias dstop='sudo $DOCKER_SERVICES_SCRIPT stop'
+alias dstatus='sudo $DOCKER_SERVICES_SCRIPT status'
+alias drestart='sudo $DOCKER_SERVICES_SCRIPT restart'
