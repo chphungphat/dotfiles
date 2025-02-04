@@ -19,7 +19,7 @@ option_as_alt = "Both"
 
 # Font configuration
 [font]
-size = 9.0
+size = 8
 
 [font.normal]
 family = "HackNerdFont"

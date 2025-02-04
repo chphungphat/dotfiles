@@ -1,5 +1,4 @@
-mkdir ./plugins/tpm
-
+mkdir -p ./plugins/tpm
+mkdir -p ./resurrect-saves
 git clone https://github.com/tmux-plugins/tpm ./plugins/tpm
-
-# tmux source ./.tmux.conf
+echo "Install plugins inside tmux with: M-a + I"
