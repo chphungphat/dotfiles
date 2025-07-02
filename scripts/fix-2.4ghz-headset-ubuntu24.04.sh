@@ -3,7 +3,7 @@
 echo "Choose the option:"
 echo "1. Disable iwlwifi (May fix headset 2.4ghz issue)"
 echo "2. Remove iwlwifi disable config"
-read -p "Option: " option
+read -pr "Option: " option
 
 case $option in
   1)

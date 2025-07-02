@@ -109,23 +109,22 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-source /usr/share/nvm/init-nvm.sh
+#
+eval $(keychain --eval --quiet --agents ssh ~/.ssh/github_ed25519 ~/.ssh/id_ed25519 ~/.ssh/ubuntu_one_ed25519)
+
+alias nv='nvim .'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
-eval $(keychain --eval --quiet --agents ssh ~/.ssh/github_ed25519 ~/.ssh/linode_debian_ed25519 ~/.ssh/id_ed25519)
-
-alias nv='nvim .'
-# alias nv='NVIM_APPNAME=LazyVim nvim'
-
-export COLORTERM=truecolor
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+export PATH="${HOME}/.local/bin":${PATH}
 
 export GIT_EDITOR=vim
 
-DOCKER_SERVICES_SCRIPT="/home/reyon/.scripts/toggle-docker.sh"
+alias tmsave='./.dotfiles/config/tmux/restore-session.sh'
 
-alias dstart='sudo $DOCKER_SERVICES_SCRIPT start'
-alias dstop='sudo $DOCKER_SERVICES_SCRIPT stop'
-alias dstatus='sudo $DOCKER_SERVICES_SCRIPT status'
-alias drestart='sudo $DOCKER_SERVICES_SCRIPT restart'
+alias lzg='lazygit'
+alias lzd='lazydocker'

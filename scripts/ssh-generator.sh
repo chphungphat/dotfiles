@@ -13,7 +13,7 @@ select algo in "${algorithms[@]}"; do
 done
 
 echo -n "Enter the name for the SSH key (default: id_$algo): "
-read keyname
+read -r keyname
 
 # Use default key name if empty
 if [ -z "$keyname" ]; then
