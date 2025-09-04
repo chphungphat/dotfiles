@@ -1,0 +1,654 @@
+This file is a merged representation of a subset of the codebase, containing files not matching ignore patterns, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of a subset of the repository's contents that is considered the most important context.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching these patterns are excluded: README.md, .git/
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+config/
+  alacritty/
+    alacritty.toml
+  tmux/
+    install.sh
+    restore-session.sh
+    tmux.conf
+scripts/
+  fix-2.4ghz-headset-ubuntu24.04.sh
+  proton-ge.sh
+  ssh-generator.sh
+  toggle-docker.sh
+.gitignore
+.zshrc
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="config/tmux/restore-session.sh">
+#!/bin/bash
+
+# Directory where tmux-resurrect saves sessions
+resurrect_dir="${HOME}/.config/tmux/resurrect-saves"
+
+# Ensure the directory exists
+if [ ! -d "$resurrect_dir" ]; then
+  echo "Resurrect directory not found: $resurrect_dir"
+  exit 1
+fi
+
+# List saved sessions
+echo "Saved tmux sessions:"
+sessions=("$resurrect_dir"/tmux_resurrect_*.txt)
+select session in "${sessions[@]}"; do
+  if [ -n "$session" ]; then
+    echo "Selected: $session"
+    break
+  else
+    echo "Invalid selection. Please try again."
+  fi
+done
+
+# Prompt for action
+echo "What would you like to do with this session?"
+options=("Delete" "Set as last" "Exit")
+select opt in "${options[@]}"; do
+  case $opt in
+    "Delete")
+      rm -f "$session"
+      echo "Deleted: $session"
+      break
+      ;;
+    "Set as last")
+      ln -sf "$(basename "$session")" "$resurrect_dir/last"
+      echo "Set as last: $session"
+      break
+      ;;
+    "Exit")
+      echo "No action taken."
+      break
+      ;;
+    *)
+      echo "Invalid option. Please try again."
+      ;;
+  esac
+done
+</file>
+
+<file path="scripts/toggle-docker.sh">
+#!/bin/bash
+
+# Check if was run with sudo or root
+if [ "$(id -u)" != 0 ]; then
+  echo "This script must be run with sudo privileges"
+  exit 1
+fi
+
+check_status() {
+  echo "Checking Containerd status..."
+  systemctl is-active --quiet containerd
+  containerd_status=$?
+
+  echo "Checking Docker status"
+  systemctl is-active --quiet docker
+  docker_status=$?
+
+  if [ $containerd_status -eq 0 ]; then
+    echo "containerd service is running"
+  else
+    echo "containerd service is not running"
+  fi
+
+  if [ $docker_status -eq 0 ]; then
+    echo "docker service is running"
+  else
+    echo "docker service is not running"
+  fi
+
+  [ $containerd_status -eq 0 ] && [ $docker_status -eq 0 ]
+  return $?
+}
+
+start_services() {
+  echo "Starting containerd service..."
+  systemctl start containerd
+  containerd_status=$?
+
+  if [ $containerd_status -eq 0 ]; then
+    echo "containerd start successfully"
+    echo "Starting docker service..."
+
+    systemctl start docker
+    docker_status=$?
+
+    if [ $docker_status -eq 0 ]; then
+      echo "docker start successfully"
+      return 0
+    else
+      echo "Failed to start docker service"
+      return 1
+    fi
+  else
+    echo "Failed to start containerd service"
+    return 1
+  fi
+}
+
+stop_services() {
+  echo "Stopping docker service..."
+  systemctl stop docker
+  docker_status=$?
+
+  echo "Stopping containerd service..."
+  systemctl stop containerd
+  containerd_status=$?
+
+  if [ $docker_status -eq 0 ] && [ $containerd_status -eq 0 ]; then
+    echo "Services stop successfully"
+    return 0
+  else
+    echo "Failed to stop services"
+    return 1
+  fi
+}
+
+restart_services() {
+  echo "Restarting services"
+  stop_services
+  sleep 2
+  start_services
+  return $?
+}
+
+case "$1" in
+  start)
+    start_services
+    ;;
+  stop)
+    stop_services
+    ;;
+  status)
+    check_status
+    ;;
+  restart)
+    restart_services
+    ;;
+  *)
+    echo "Usage: $0 (start | stop | status | restart)"
+    exit 1
+    ;;
+esac
+
+exit $?
+</file>
+
+<file path="scripts/fix-2.4ghz-headset-ubuntu24.04.sh">
+#!/bin/bash
+
+echo "Choose the option:"
+echo "1. Disable iwlwifi (May fix headset 2.4ghz issue)"
+echo "2. Remove iwlwifi disable config"
+read -pr "Option: " option
+
+case $option in
+  1)
+    echo "Disabling iwlwifi..."
+    sudo tee /etc/modprobe.d/iwlwifi-opt.conf <<<"options iwlwifi bt_coex_active=N"
+    echo "Done"
+    ;;
+  2)
+    echo "Removing iwlwifi disable config..."
+    sudo rm /etc/modprobe.d/iwlwifi-opt.conf
+    echo "Done"
+    ;;
+  *)
+    echo "Invalid option"
+    exit 1
+    ;;
+esac
+</file>
+
+<file path="scripts/proton-ge.sh">
+#!/bin/bash
+set -euo pipefail
+
+# make temp working directory
+echo "Creating temporary working directory..."
+rm -rf /tmp/proton-ge-custom
+mkdir /tmp/proton-ge-custom
+cd /tmp/proton-ge-custom
+
+# download tarball
+echo "Fetching tarball URL..."
+tarball_url=$(curl -s https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest | grep browser_download_url | cut -d\" -f4 | grep .tar.gz)
+tarball_name=$(basename "$tarball_url")
+echo "Downloading tarball: $tarball_name..."
+curl -# -L "$tarball_url" -o "$tarball_name" --no-progress-meter
+
+# download checksum
+echo "Fetching checksum URL..."
+checksum_url=$(curl -s https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest | grep browser_download_url | cut -d\" -f4 | grep .sha512sum)
+checksum_name=$(basename "$checksum_url")
+echo "Downloading checksum: $checksum_name..."
+curl -# -L "$checksum_url" -o "$checksum_name" --no-progress-meter
+
+# check tarball with checksum
+echo "Verifying tarball $tarball_name with checksum $checksum_name..."
+sha512sum -c "$checksum_name"
+# if result is ok, continue
+
+# make steam directory if it does not exist
+echo "Creating Steam directory if it does not exist..."
+mkdir -p ~/.steam/root/compatibilitytools.d
+
+# extract proton tarball to steam directory
+echo "Extracting $tarball_name to Steam directory..."
+tar -xf "$tarball_name" -C ~/.steam/root/compatibilitytools.d/
+echo "All done :)"
+</file>
+
+<file path="scripts/ssh-generator.sh">
+#!/bin/bash
+
+# Available SSH key algorithms
+declare -a algorithms=("rsa" "ecdsa" "ed25519")
+
+echo "Select an SSH key algorithm:"
+select algo in "${algorithms[@]}"; do
+  if [[ -n "$algo" ]]; then
+    break
+  else
+    echo "Invalid choice. Please select a valid algorithm."
+  fi
+done
+
+echo -n "Enter the name for the SSH key (default: id_$algo): "
+read -r keyname
+
+# Use default key name if empty
+if [ -z "$keyname" ]; then
+  keyname="id_$algo"
+fi
+
+keypath="$HOME/.ssh/$keyname"
+
+# Generate the SSH key pair
+if [[ "$algo" == "rsa" ]]; then
+  ssh-keygen -t rsa -b 4096 -f "$keypath" -N ""
+elif [[ "$algo" == "ecdsa" ]]; then
+  ssh-keygen -t ecdsa -b 521 -f "$keypath" -N ""
+elif [[ "$algo" == "ed25519" ]]; then
+  ssh-keygen -t ed25519 -f "$keypath" -N ""
+fi
+
+# Set appropriate permissions
+chmod 600 "$keypath"
+chmod 644 "$keypath.pub"
+
+echo "SSH key pair generated at: $keypath and $keypath.pub"
+</file>
+
+<file path="config/tmux/install.sh">
+mkdir -p ./plugins/tpm
+mkdir -p ./resurrect-saves
+git clone https://github.com/tmux-plugins/tpm ./plugins/tpm
+echo "Install plugins inside tmux with: M-a + I"
+</file>
+
+<file path=".gitignore">
+plugins
+resurrect-saves
+</file>
+
+<file path=".zshrc">
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block; everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
+
+# Path to your Oh My Zsh installation.
+export ZSH="$HOME/.oh-my-zsh"
+
+# Set name of the theme to load --- if set to "random", it will
+# load a random theme each time Oh My Zsh is loaded, in which case,
+# to know which specific one was loaded, run: echo $RANDOM_THEME
+# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+ZSH_THEME="powerlevel10k/powerlevel10k"
+
+# Set list of themes to pick from when loading at random
+# Setting this variable when ZSH_THEME=random will cause zsh to load
+# a theme from this variable instead of looking in $ZSH/themes/
+# If set to an empty array, this variable will have no effect.
+# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
+
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
+
+# Uncomment the following line to use hyphen-insensitive completion.
+# Case-sensitive completion must be off. _ and - will be interchangeable.
+# HYPHEN_INSENSITIVE="true"
+
+# Uncomment one of the following lines to change the auto-update behavior
+# zstyle ':omz:update' mode disabled  # disable automatic updates
+# zstyle ':omz:update' mode auto      # update automatically without asking
+# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
+
+# Uncomment the following line to change how often to auto-update (in days).
+# zstyle ':omz:update' frequency 13
+
+# Uncomment the following line if pasting URLs and other text is messed up.
+# DISABLE_MAGIC_FUNCTIONS="true"
+
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
+
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment the following line to enable command auto-correction.
+# ENABLE_CORRECTION="true"
+
+# Uncomment the following line to display red dots whilst waiting for completion.
+# You can also set it to another string to have that shown instead of the default red dots.
+# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
+# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
+# COMPLETION_WAITING_DOTS="true"
+
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# You can set one of the optional three formats:
+# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# or set a custom format using the strftime function format specifications,
+# see 'man strftime' for details.
+# HIST_STAMPS="mm/dd/yyyy"
+
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
+
+# Which plugins would you like to load?
+# Standard plugins can be found in $ZSH/plugins/
+# Custom plugins may be added to $ZSH_CUSTOM/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+
+source $ZSH/oh-my-zsh.sh
+
+# User configuration
+
+# export MANPATH="/usr/local/man:$MANPATH"
+
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='nvim'
+# fi
+
+# Compilation flags
+# export ARCHFLAGS="-arch $(uname -m)"
+
+# Set personal aliases, overriding those provided by Oh My Zsh libs,
+# plugins, and themes. Aliases can be placed here, though Oh My Zsh
+# users are encouraged to define aliases within a top-level file in
+# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
+# - $ZSH_CUSTOM/aliases.zsh
+# - $ZSH_CUSTOM/macos.zsh
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+#
+eval $(keychain --eval --quiet --agents ssh ~/.ssh/github_ed25519 ~/.ssh/id_ed25519 ~/.ssh/ubuntu_one_ed25519)
+
+alias nv='nvim .'
+
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+export PATH="${HOME}/.local/bin":${PATH}
+
+export GIT_EDITOR=vim
+
+alias tmsave='./.dotfiles/config/tmux/restore-session.sh'
+
+alias lzg='lazygit'
+alias lzd='lazydocker'
+</file>
+
+<file path="config/alacritty/alacritty.toml">
+[general]
+import = [
+    "~/.config/alacritty/themes/themes/gruvbox_dark.toml"
+]
+
+[env]
+term = "xterm-256color"
+# term = "screen-256color"
+
+[window]
+padding = { x = 1, y = 1 }
+decorations_theme_variant = "Dark"
+opacity = 0.92
+dynamic_padding = true
+option_as_alt = "Both"
+blur = true
+
+[font]
+size = 9.0
+offset = { x = 0, y = 1 }
+glyph_offset = { x = 0, y = 0 }
+builtin_box_drawing = true
+
+[font.normal]
+family = "JetBrainsMonoNerdFont"
+
+[cursor]
+style = { shape = "Block", blinking = "On" }
+blink_interval = 750
+thickness = 0.15
+
+[keyboard]
+bindings = [
+    # Make Alt+backspace delete whole words
+    { key = "Back", mods = "Alt", chars = "\u001b\u007f" },
+    # Make Alt+left/right move between words
+    { key = "Left",  mods = "Alt", chars = "\u001b[1;5D" },
+    { key = "Right", mods = "Alt", chars = "\u001b[1;5C" }
+]
+
+# Scrolling behavior
+[scrolling]
+history = 10000
+multiplier = 3
+
+[mouse]
+hide_when_typing = true
+
+[selection]
+semantic_escape_chars = ",│`|:\"' ()[]{}<>\t"
+save_to_clipboard = true
+</file>
+
+<file path="config/tmux/tmux.conf">
+# Terminal Settings
+set -g default-terminal "xterm-256color"
+set -ag terminal-overrides ",xterm-256color:RGB"
+
+set-option -sa terminal-overrides ',alacritty:RGB'
+
+# Window and Pane Indexing
+set -g base-index 1
+set -g pane-base-index 1
+
+# Window Management
+setw -g automatic-rename on
+set -g renumber-windows on
+
+# Bind c to create new window after the current window
+bind-key c new-window -a
+
+# Prefix Key
+unbind C-b
+set-option -g prefix M-a
+bind-key M-a send-prefix
+
+# Split and Navigation Keybindings
+bind s split-window -h -c '#{pane_current_path}'
+bind v split-window -v -c '#{pane_current_path}'
+unbind '"'
+unbind %
+
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+set -g repeat-time 550
+
+bind-key -n S-Left swap-window -t -1
+bind-key -n S-Right swap-window -t +1
+
+bind-key r command-prompt -I "#W" "rename-window '%%'"
+bind-key R command-prompt -I "#S" "rename-session '%%'"
+
+bind-key -n M-1 select-window -t 1
+bind-key -n M-2 select-window -t 2
+bind-key -n M-3 select-window -t 3
+bind-key -n M-4 select-window -t 4
+bind-key -n M-5 select-window -t 5
+bind-key -n M-6 select-window -t 6
+bind-key -n M-7 select-window -t 7
+
+# Maximize pane toggle
+bind-key m resize-pane -Z
+
+setw -g mode-keys vi
+set -sg escape-time 10
+
+# Copy Mode Settings
+bind-key -T copy-mode-vi 'v' send -X begin-selection
+bind-key -T copy-mode-vi 'y' send -X copy-pipe "reattach-to-user-namespace pbcopy"
+
+set -g mouse on
+
+# Plugins
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'
+set -g @plugin 'tmux-plugins/tmux-prefix-highlight'
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+
+# Manual reload with prefix + P
+bind P source-file ~/.config/tmux/tmux.conf \; display-message "Config reloaded..."
+
+set -g status-style "bg=#1d2021,fg=#ebdbb2"
+
+# Window Status Styling
+setw -g window-status-style "bg=#1d2021,fg=#928374"  # Inactive windows
+setw -g window-status-current-style "bg=#3c3836,fg=#ebdbb2,bold"  # Active window
+setw -g window-status-activity-style "bg=#1d2021,fg=#fe8019"  # Window with activity (Orange)
+
+# Window Status Format
+set -wg window-status-separator ' . '
+setw -g window-status-format "#[fg=#928374]#I#[fg=#3c3836]│#[fg=#a89984]#W"
+setw -g window-status-current-format "#[fg=#fe8019]#I#[fg=#d5c4a1]│#[fg=#ebdbb2,bold]#W"
+
+# Pane Styling (Better Contrast)
+set -g pane-border-style "fg=#504945"  # Normal pane border
+set -g pane-active-border-style "fg=#fe8019"  # Active pane border (Orange)
+
+# Message Styling
+set -g message-style "bg=#3c3836,fg=#ebdbb2"  # Command/message line
+set -g message-command-style "bg=#3c3836,fg=#ebdbb2"  # Command mode
+
+# Mode Styling (for copy mode)
+set -g mode-style "bg=#3c3836,fg=#ebdbb2"
+
+# Prefix Highlight Settings (More Visible)
+set -g @prefix_highlight_fg '#1d2021'  # Dark text
+set -g @prefix_highlight_bg '#fe8019'  # Orange background
+set -g @prefix_highlight_show_copy_mode 'on'
+set -g @prefix_highlight_copy_mode_attr 'fg=#1d2021,bg=#83a598'  # Dark text in copy mode
+set -g @prefix_highlight_show_sync_mode 'on'
+set -g @prefix_highlight_sync_mode_attr 'fg=#1d2021,bg=#458588'  # Dark text in sync mode
+
+# Status Bar Layout (Higher Contrast with Orange)
+set -g status-left-length 30
+set -g status-right-length 100
+set -g status-left "#[fg=#1d2021,bg=#fe8019,bold] #S #[fg=#fe8019,bg=#1d2021]"
+set -g status-right "#{prefix_highlight} #[fg=#ebdbb2]%a %Y-%m-%d #[fg=#fe8019,bold]%H:%M"
+
+# Enhanced History and Performance
+set -g history-limit 1000
+
+# Window Activity Settings
+setw -g monitor-activity off
+set -g visual-activity off
+
+# Resurrect Configuration
+set -g @resurrect-dir '~/.config/tmux/resurrect-saves'
+set -g @resurrect-capture-pane-contents 'off'
+set -g @resurrect-save 'C-s'
+set -g @resurrect-restore 'C-r'
+
+bind C-d command-prompt -p "Delete all saved sessions? (y/n)" "run-shell 'rm -f ~/.config/tmux/resurrect-saves/*.txt && tmux display-message \"All saved sessions deleted\"'"
+
+bind X confirm-before -p "Kill session #{session_name}? (y/n)" kill-session
+
+# Initialize TPM
+run '~/.config/tmux/plugins/tpm/tpm'
+</file>
+
+</files>
