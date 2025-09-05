@@ -1,5 +1,5 @@
-plugins
-resurrect-saves
+config/tmux/plugins
+config/tmux/resurrect-saves
 
 tt.*
 .tests
@@ -10,3 +10,4 @@ foo.*
 *.log
 data
 
+.neoconf.json
