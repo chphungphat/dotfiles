@@ -1,7 +1,5 @@
 [general]
-import = [
-    "~/.config/alacritty/themes/themes/gruvbox_dark.toml"
-]
+import = ["~/.config/alacritty/themes/themes/gruvbox_dark.toml"]
 
 [env]
 term = "xterm-256color"
@@ -16,7 +14,7 @@ option_as_alt = "Both"
 blur = true
 
 [font]
-size = 9.0
+size = 10.0
 offset = { x = 0, y = 1 }
 glyph_offset = { x = 0, y = 0 }
 builtin_box_drawing = true
@@ -31,11 +29,11 @@ thickness = 0.15
 
 [keyboard]
 bindings = [
-    # Make Alt+backspace delete whole words
-    { key = "Back", mods = "Alt", chars = "\u001b\u007f" },
-    # Make Alt+left/right move between words
-    { key = "Left",  mods = "Alt", chars = "\u001b[1;5D" },
-    { key = "Right", mods = "Alt", chars = "\u001b[1;5C" }
+  # Make Alt+backspace delete whole words
+  { key = "Back", mods = "Alt", chars = "\u001b\u007f" },
+  # Make Alt+left/right move between words
+  { key = "Left", mods = "Alt", chars = "\u001b[1;5D" },
+  { key = "Right", mods = "Alt", chars = "\u001b[1;5C" },
 ]
 
 # Scrolling behavior
