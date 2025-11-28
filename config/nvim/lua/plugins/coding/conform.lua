@@ -41,9 +41,6 @@ return {
         cpp = { "clang_format" },
         objc = { "clang_format" },
         objcpp = { "clang_format" },
-
-        -- Fallbacks for any file
-        ["_"] = { "trim_whitespace" }, -- Clean up whitespace for all files
       },
 
       -- Smart format on save - only when formatters are available

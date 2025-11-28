@@ -246,8 +246,8 @@ return {
         offsetEncoding = { "utf-16" },
       }),
     })
-    vim.lsp.enable("jdtls")
 
+    vim.lsp.enable("jdtls")
     vim.lsp.config("jdtls", {
       cmd = {
         "java",
@@ -256,22 +256,20 @@ return {
         "-Declipse.product=org.eclipse.jdt.ls.core.product",
         "-Dlog.protocol=true",
         "-Dlog.level=ALL",
-        "-Xms1g",
-        "-Xmx2g",
-        "-Xmx4g",
+        "-Xms12g",
+        "-Xmx12g",
         "--add-modules=ALL-SYSTEM",
         "--add-opens",
         "java.base/java.util=ALL-UNNAMED",
         "--add-opens",
         "java.base/java.lang=ALL-UNNAMED",
+        "-javaagent:" .. vim.fn.glob(
+          workspaceEnvFolder .. "/jdtls/latest/plugins/lombok-*.jar"
+        ),
         "-jar",
         vim.fn.glob(
-          "/home/reyon/Workspaces/.environment/jdtls/latest/plugins/org.eclipse.equinox.launcher_*.jar"
+          workspaceEnvFolder .. "/jdtls/latest/plugins/org.eclipse.equinox.launcher_*.jar"
         ),
-        -- "/home/reyon/Workspaces/.environment/jdtls/latest/plugins/org.eclipse.equinox.launcher_*.jar",
-        -- vim.fn.glob(
-        --   workspaceEnvFolder .. "/jdtls/latest/plugins/org.eclipse.equinox.launcher_*.jar"
-        -- ),
         "-configuration",
         workspaceEnvFolder .. "/jdtls/latest/config_linux",
         "-data",
@@ -297,16 +295,16 @@ return {
             downloadSources = true,
           },
           imports = {
-            -- gradle = {
-            --   wrapper = {
-            --     checksums = {
-            --       {
-            --         sha256 = "e68185c8c0f67873dcd98916621870266a71584dfb0a2861d87d7077ebc39837",
-            --         allowed = true,
-            --       },
-            --     },
-            --   },
-            -- },
+            gradle = {
+              wrapper = {
+                checksums = {
+                  {
+                    sha256 = "e68185c8c0f67873dcd98916621870266a71584dfb0a2861d87d7077ebc39837",
+                    allowed = true,
+                  },
+                },
+              },
+            },
           },
           referencesCodeLens = {
             enabled = true,
@@ -314,13 +312,13 @@ return {
           references = {
             includeDecompiledSources = true,
           },
-          -- format = {
-          --   enabled = true,
-          --   settings = {
-          --     url = vim.fn.stdpath("config") .. "/resources/intellij-java-google-style.xml",
-          --     profile = "GoogleStyle",
-          --   },
-          -- },
+          format = {
+            enabled = true,
+            settings = {
+              url = vim.fn.stdpath("config") .. "/resources/intellij-java-google-style.xml",
+              profile = "GoogleStyle",
+            },
+          },
           signatureHelp = {
             enabled = true,
           },

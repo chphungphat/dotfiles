@@ -11,3 +11,5 @@ foo.*
 data
 
 .neoconf.json
+
+config/pnvim

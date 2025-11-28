@@ -34,6 +34,10 @@ return {
 
       files = {
         prompt = "Files❯ ",
+        rg_opts = [[--color=never --hidden --files -g "!.git" -g "!**/build/**" -g "!*.class"]],
+        git_icons = true,
+        hidden = false,
+        no_ignore = false,
         cwd_prompt = false,
         actions = {
           ["default"] = require("fzf-lua.actions").file_edit,
@@ -43,9 +47,16 @@ return {
       grep = {
         prompt = "Rg❯ ",
         input_prompt = "Grep For❯ ",
+        hidden = false,
+        no_ignore = false,
+        rg_opts = [[--column --line-number --no-heading --color=always --smart-case --max-columns=4096 -g "!**/build/**" -g "!*.class" -e]],
         actions = {
           ["default"] = require("fzf-lua.actions").file_edit,
         },
+      },
+
+      live_grep = {
+        rg_opts = [[--column --line-number --no-heading --color=always --smart-case --max-columns=4096 -g "!**/build/**" -g "!*.class" -e]],
       },
 
       lsp = {
@@ -75,7 +86,7 @@ return {
           syntax = true,
           syntax_limit_l = 0,
           syntax_limit_b = 1024 * 1024, -- 1MB
-          limit_b = 1024 * 1024 * 10,   -- 10MB
+          limit_b = 1024 * 1024 * 10, -- 10MB
           treesitter = { enabled = true },
         },
       },
