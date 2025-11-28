@@ -109,8 +109,6 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-#
-eval $(keychain --eval --quiet --agents ssh ~/.ssh/github_ed25519 ~/.ssh/id_ed25519 ~/.ssh/ubuntu_one_ed25519)
 
 alias nv='nvim .'
 
@@ -128,3 +126,15 @@ alias tmsave='./.dotfiles/config/tmux/restore-session.sh'
 
 alias lzg='lazygit'
 alias lzd='lazydocker'
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
+export WORKSPACE_ENV="${HOME}/Workspaces/.environment"
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+
