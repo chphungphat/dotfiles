@@ -9,7 +9,8 @@ vim.api.nvim_create_autocmd("TextYankPost", {
 local cursorline_group = vim.api.nvim_create_augroup("CursorLineManagement", { clear = true })
 
 local excluded_filetypes = {
-  "TelescopePrompt", "fzf", "oil_preview", "oil", "copilot-chat",
+  "TelescopePrompt", "snacks_picker", "snacks_picker_list", "snacks_picker_preview",
+  "oil_preview", "oil", "copilot-chat",
   "neo-tree", "neo-tree-popup", "NeogitStatus", "lazy", "mason",
   "help", "terminal", "prompt", "nofile"
 }

@@ -37,57 +37,65 @@ return {
         vim.keymap.set(
           "n",
           "gd",
-          "<cmd>FzfLua lsp_definitions jump_to_single_result=true ignore_current_line=true<cr>",
+          function()
+            require("snacks").picker.lsp_definitions()
+          end,
           vim.tbl_extend("force", opts, { desc = "Go to definition" })
         )
         vim.keymap.set(
           "n",
           "gD",
-          "<cmd>FzfLua lsp_declarations jump_to_single_result=true ignore_current_line=true<cr>",
+          function()
+            require("snacks").picker.lsp_declarations()
+          end,
           vim.tbl_extend("force", opts, { desc = "Go to declaration" })
         )
         vim.keymap.set(
           "n",
           "gr",
-          "<cmd>FzfLua lsp_references jump_to_single_result=true ignore_current_line=true<cr>",
+          function()
+            require("snacks").picker.lsp_references()
+          end,
           vim.tbl_extend("force", opts, { desc = "Show references" })
         )
         vim.keymap.set(
           "n",
           "gi",
-          "<cmd>FzfLua lsp_implementations jump_to_single_result=true ignore_current_line=true<cr>",
+          function()
+            require("snacks").picker.lsp_implementations()
+          end,
           vim.tbl_extend("force", opts, { desc = "Go to implementation" })
         )
         vim.keymap.set(
           "n",
           "gt",
-          "<cmd>FzfLua lsp_typedefs jump_to_single_result=true ignore_current_line=true<cr>",
+          function()
+            require("snacks").picker.lsp_type_definitions()
+          end,
           vim.tbl_extend("force", opts, { desc = "Go to type definition" })
         )
 
         vim.keymap.set(
           "n",
           "<leader>cs",
-          "<cmd>FzfLua lsp_document_symbols<cr>",
+          function()
+            require("snacks").picker.lsp_symbols()
+          end,
           vim.tbl_extend("force", opts, { desc = "Document symbols" })
         )
         vim.keymap.set(
           "n",
           "<leader>cS",
-          "<cmd>FzfLua lsp_workspace_symbols<cr>",
+          function()
+            require("snacks").picker.lsp_workspace_symbols()
+          end,
           vim.tbl_extend("force", opts, { desc = "Workspace symbols" })
-        )
-        vim.keymap.set(
-          "n",
-          "<leader>cf",
-          "<cmd>FzfLua lsp_finder<cr>",
-          vim.tbl_extend("force", opts, { desc = "LSP Finder (all locations)" })
         )
 
         vim.keymap.set(
           { "n", "v" },
           "<leader>ca",
-          "<cmd>FzfLua lsp_code_actions<cr>",
+          vim.lsp.buf.code_action,
           vim.tbl_extend("force", opts, { desc = "Code actions" })
         )
         vim.keymap.set(
