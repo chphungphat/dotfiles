@@ -59,23 +59,6 @@ vim.o.laststatus = 3
 
 vim.o.lazyredraw = true
 
--- vim.o.winborder = "rounded"
-
--- vim.opt.wildmenu = true
--- vim.opt.wildmode = "longest,list"
--- vim.opt.wildoptions = "pum"
--- vim.opt.wildignorecase = true
---
--- vim.opt.wildignore = {
---   "*.o", "*.obj", "*.bin", "*.dll", "*.exe",
---   "*/.git/*", "*/.svn/*", "*/.hg/*",
---   "*/node_modules/*", "*/vendor/*",
---   "*.pyc", "*.pyo", "*.pyd", "__pycache__",
---   "*.class", "*.jar",
---   "*.min.*", "bundle*.js",
---   "*.swp", "*.tmp", "*~"
--- }
-
 vim.g.loaded_node_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_python3_provider = 0

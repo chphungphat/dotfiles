@@ -27,7 +27,10 @@ return {
         },
       },
     },
-    -- Enable other useful snacks features
+    explorer = {
+      enabled = true,
+      replace_netrw = true,
+    },
     bigfile = { enabled = true },
     notifier = { enabled = true },
     quickfile = { enabled = true },
@@ -35,6 +38,22 @@ return {
     words = { enabled = true },
   },
   keys = {
+    -- File explorer
+    {
+      "<leader>ee",
+      function()
+        require("snacks").explorer()
+      end,
+      desc = "Toggle Explorer",
+    },
+    {
+      "<leader>ef",
+      function()
+        require("snacks").explorer.open({ focus = true })
+      end,
+      desc = "Focus Explorer on Current File",
+    },
+
     -- File and buffer navigation
     {
       "<leader><leader>",

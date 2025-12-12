@@ -75,6 +75,7 @@ return {
 
       formatters = {
         prettier = {
+          command = "prettier",
           condition = function(_, ctx)
             local cwd = vim.fs.dirname(ctx.filename)
             local prettier_files = {

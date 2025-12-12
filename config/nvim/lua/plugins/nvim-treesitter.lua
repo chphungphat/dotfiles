@@ -6,7 +6,7 @@ return {
     config = function()
       require("nvim-treesitter.configs").setup({
         ensure_installed = {
-          "javascript", "typescript", "tsx", "bash", "c",
+          "javascript", "typescript", "tsx", "bash", "c", "java",
           "html", "lua", "luadoc", "markdown", "vim", "vimdoc", "query"
         },
         auto_install = true,
@@ -38,16 +38,13 @@ return {
         },
       })
 
-      -- Modern folding setup (Neovim 0.11+)
-      vim.opt.foldmethod = "expr"
-      vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+      vim.opt.foldmethod = "indent"
       vim.opt.foldcolumn = "0"
       vim.opt.foldtext = ""
       vim.opt.foldlevel = 99
       vim.opt.foldlevelstart = 99
       vim.opt.foldenable = true
 
-      -- Single autocmd for large file handling
       local treesitter_group = vim.api.nvim_create_augroup("TreesitterOptimized", { clear = true })
 
       vim.api.nvim_create_autocmd("BufReadPre", {

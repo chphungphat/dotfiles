@@ -31,12 +31,6 @@ return {
 					relative = "editor",
 				},
 			},
-
-			integration = {
-				["nvim-tree"] = {
-					enable = true, -- Integrate with nvim-tree/nvim-tree.lua (if installed)
-				},
-			},
 		})
 	end,
 }

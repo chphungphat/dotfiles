@@ -11,7 +11,9 @@ return {
           "terminal",
           "lazy",
           "mason",
-          "NvimTree",
+          "snacks_picker",
+          "snacks_picker_list",
+          "snacks_picker_preview",
           "neo-tree",
           "TelescopePrompt",
           "oil",
@@ -20,7 +22,7 @@ return {
       },
 
       chunk = {
-        enable = true,
+        enable = false,
         chars = {
           horizontal_line = "─",
           vertical_line = "│",
