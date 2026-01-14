@@ -241,12 +241,12 @@ return {
         vim.fn.glob(workspaceEnvFolder .. "/jdtls/latest/plugins/org.eclipse.equinox.launcher_*.jar")
 
     if lombok_jar == "" or launcher_jar == "" then
-      vim.notify(
-        "jdtls not properly configured. Missing jars at: "
-        .. workspaceEnvFolder
-        .. "/jdtls/latest/plugins/",
-        vim.log.levels.WARN
-      )
+      -- vim.notify(
+      --   "jdtls not properly configured. Missing jars at: "
+      --   .. workspaceEnvFolder
+      --   .. "/jdtls/latest/plugins/",
+      --   vim.log.levels.WARN
+      -- )
     else
       vim.lsp.enable("jdtls")
       vim.lsp.config("jdtls", {
@@ -471,5 +471,66 @@ return {
 
     vim.lsp.enable("marksman")
     vim.lsp.config("marksman", {})
+
+    -- OmniSharp for C# / .NET
+    local omnisharp_bin = os.getenv("HOME") .. "/.local/share/omnisharp/run"
+    if vim.fn.executable(omnisharp_bin) == 1 then
+      vim.lsp.enable("omnisharp")
+      vim.lsp.config("omnisharp", {
+        cmd = {
+          omnisharp_bin,
+          "--languageserver",
+          "--hostPID",
+          tostring(vim.fn.getpid()),
+        },
+        root_dir = vim.fs.dirname(vim.fs.find({
+          "*.sln",
+          "*.csproj",
+          "omnisharp.json",
+          "function.json",
+          ".git",
+        }, { upward = true })[1]),
+        settings = {
+          FormattingOptions = {
+            EnableEditorConfigSupport = true,
+            OrganizeImports = true,
+          },
+          MsBuild = {
+            LoadProjectsOnDemand = false,
+          },
+          RoslynExtensionsOptions = {
+            EnableAnalyzersSupport = true,
+            EnableImportCompletion = true,
+            AnalyzeOpenDocumentsOnly = true,
+          },
+          Sdk = {
+            IncludePrereleases = true,
+          },
+        },
+        on_attach = function(client, bufnr)
+          local opts = { buffer = bufnr, noremap = true, silent = true }
+          -- C# specific keymaps
+          vim.keymap.set(
+            "n",
+            "<leader>co",
+            function()
+              vim.lsp.buf.code_action({
+                apply = true,
+                context = {
+                  only = { "source.organizeImports" },
+                  diagnostics = {},
+                },
+              })
+            end,
+            vim.tbl_extend("force", opts, { desc = "Organize Imports (C#)" })
+          )
+        end,
+      })
+    else
+      -- vim.notify(
+      --   "OmniSharp not found at: " .. omnisharp_bin .. "\nInstall with: curl -sL https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.39.15/omnisharp-linux-x64-net6.0.tar.gz | tar xz -C ~/.local/share/omnisharp",
+      --   vim.log.levels.WARN
+      -- )
+    end
   end,
 }

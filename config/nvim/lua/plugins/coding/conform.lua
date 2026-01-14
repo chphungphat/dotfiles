@@ -41,6 +41,9 @@ return {
         cpp = { "clang_format" },
         objc = { "clang_format" },
         objcpp = { "clang_format" },
+
+        -- C#
+        cs = { "csharpier" },
       },
 
       -- Smart format on save - only when formatters are available
