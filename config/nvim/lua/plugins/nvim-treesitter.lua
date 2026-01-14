@@ -2,51 +2,61 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    event = { "VeryLazy" },
+    lazy = false, -- nvim-treesitter does not support lazy-loading
     config = function()
-      require("nvim-treesitter.configs").setup({
-        ensure_installed = {
-          "javascript", "typescript", "tsx", "bash", "c", "java",
-          "html", "lua", "luadoc", "markdown", "vim", "vimdoc", "query"
-        },
-        auto_install = true,
-        sync_install = false,
-
-        highlight = {
-          enable = true,
-          additional_vim_regex_highlighting = false,
-
-          disable = function(_, buf)
-            local max_filesize = 100 * 1024 -- 100 KB
-            local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
-            return ok and stats and stats.size > max_filesize
-          end,
-        },
-
-        indent = {
-          enable = true,
-          disable = { "python", "yaml" },
-        },
-
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = "<C-space>",
-            node_incremental = "<C-space>",
-            node_decremental = "<BS>",
-          },
-        },
+      -- Install parsers
+      require("nvim-treesitter").install({
+        "javascript", "typescript", "tsx", "bash", "c", "c_sharp", "java",
+        "html", "lua", "luadoc", "markdown", "vim", "vimdoc", "query"
       })
 
-      vim.opt.foldmethod = "indent"
+      -- Configure folding
+      vim.opt.foldmethod = "expr"
+      vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
       vim.opt.foldcolumn = "0"
       vim.opt.foldtext = ""
       vim.opt.foldlevel = 99
       vim.opt.foldlevelstart = 99
       vim.opt.foldenable = true
 
-      local treesitter_group = vim.api.nvim_create_augroup("TreesitterOptimized", { clear = true })
+      -- Enable treesitter features via autocommands
+      local treesitter_group = vim.api.nvim_create_augroup("TreesitterFeatures", { clear = true })
 
+      -- Enable highlighting for supported filetypes
+      vim.api.nvim_create_autocmd("FileType", {
+        group = treesitter_group,
+        pattern = {
+          "javascript", "typescript", "tsx", "bash", "c", "cs", "java",
+          "html", "lua", "markdown", "vim", "python", "go", "rust"
+        },
+        callback = function()
+          local buf = vim.api.nvim_get_current_buf()
+          local filename = vim.api.nvim_buf_get_name(buf)
+
+          -- Check file size
+          if filename ~= "" then
+            local ok, stats = pcall(vim.uv.fs_stat, filename)
+            if ok and stats then
+              -- Disable for files larger than 100KB
+              if stats.size > 100 * 1024 then
+                return
+              end
+            end
+          end
+
+          -- Enable treesitter highlighting
+          vim.treesitter.start()
+
+          -- Enable treesitter folding
+          vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
+          vim.wo[0][0].foldmethod = "expr"
+
+          -- Enable experimental indentation (optional)
+          -- vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+        end,
+      })
+
+      -- Optimize for large files
       vim.api.nvim_create_autocmd("BufReadPre", {
         group = treesitter_group,
         callback = function(event)
@@ -63,7 +73,8 @@ return {
             vim.wo.foldenable = false
 
             if stats.size > 5 * 1024 * 1024 then -- 5MB
-              vim.b[buf].ts_highlight = false
+              -- Stop treesitter for very large files
+              pcall(vim.treesitter.stop, buf)
             end
           end
         end,
@@ -71,37 +82,12 @@ return {
     end,
   },
 
-  {
-    "nvim-treesitter/nvim-treesitter-textobjects",
-    event = "VeryLazy",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    config = function()
-      require("nvim-treesitter.configs").setup({
-        textobjects = {
-          select = {
-            enable = true,
-            lookahead = true,
-            keymaps = {
-              ["af"] = "@function.outer",
-              ["if"] = "@function.inner",
-              ["ac"] = "@class.outer",
-              ["ic"] = "@class.inner",
-            },
-          },
-          move = {
-            enable = true,
-            set_jumps = true,
-            goto_next_start = {
-              ["]f"] = "@function.outer",
-              ["]c"] = "@class.outer",
-            },
-            goto_previous_start = {
-              ["[f"] = "@function.outer",
-              ["[c"] = "@class.outer",
-            },
-          },
-        },
-      })
-    end,
-  },
+  -- nvim-treesitter-textobjects is temporarily disabled
+  -- It doesn't yet support the new nvim-treesitter rewrite
+  -- You can re-enable it once it's updated to work with the new API
+  -- {
+  --   "nvim-treesitter/nvim-treesitter-textobjects",
+  --   lazy = false,
+  --   dependencies = { "nvim-treesitter/nvim-treesitter" },
+  -- },
 }

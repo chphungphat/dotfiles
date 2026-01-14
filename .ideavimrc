@@ -1,0 +1,505 @@
+" ============================================================================
+" IDEAVIMRC - Generated from Neovim Configuration
+" ============================================================================
+" This file mirrors the keymaps from ~/.dotfiles/config/nvim
+" Last updated: 2025-12-30
+" ============================================================================
+
+" ============================================================================
+" CORE SETTINGS
+" ============================================================================
+
+" Leader key configuration
+let mapleader = " "
+let maplocalleader = " "
+
+" Enable IdeaVim plugins
+set surround
+set commentary
+set argtextobj
+set textobj-entire
+set ReplaceWithRegister
+set exchange
+set highlightedyank
+set NERDTree
+set easymotion
+set which-key
+set notimeout
+
+" Vim settings
+set scrolloff=5
+set incsearch
+set ignorecase
+set smartcase
+set number
+set relativenumber
+set showmode
+set showcmd
+set visualbell
+set clipboard+=unnamed
+set clipboard+=ideaput
+set ideajoin
+set ideastatusicon=gray
+set idearefactormode=keep
+
+" ============================================================================
+" CORE KEYMAPS - From lua/core/keymap.lua
+" ============================================================================
+
+" Disable F1
+nnoremap <F1> <nop>
+inoremap <F1> <nop>
+vnoremap <F1> <nop>
+
+" Window navigation (C-h/j/k/l)
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" Window splits
+nnoremap <leader>- :action SplitHorizontally<CR>
+nnoremap <leader>\ :action SplitVertically<CR>
+
+" Clear search highlight
+nnoremap <ESC> :nohlsearch<CR>
+
+" Terminal mode (IntelliJ terminal)
+tnoremap <Esc><Esc> <C-\><C-n>
+
+" Help
+nnoremap <leader>hh :action HelpTopics<CR>
+
+" ============================================================================
+" DIAGNOSTICS & ERRORS - From lua/core/keymap.lua
+" ============================================================================
+
+" Show diagnostic/error messages
+nnoremap <leader>cd :action ShowErrorDescription<CR>
+
+" Quickfix list
+nnoremap <leader>ca :action ActivateProblemsViewToolWindow<CR>
+
+" Show all diagnostics
+nnoremap <leader>cD :action ActivateProblemsViewToolWindow<CR>
+
+" Show warnings
+nnoremap <leader>cw :action ActivateProblemsViewToolWindow<CR>
+
+" Show errors
+nnoremap <leader>ce :action ActivateProblemsViewToolWindow<CR>
+
+" Toggle diagnostic virtual text (closest equivalent)
+nnoremap <leader>cv :action ToggleInlayHintsGloballyAction<CR>
+
+" ============================================================================
+" LSP NAVIGATION - From lua/plugins/coding/lspconfig.lua
+" ============================================================================
+
+" Go to definition/declaration
+nnoremap gd :action GotoDeclaration<CR>
+nnoremap gD :action GotoTypeDeclaration<CR>
+
+" Show references
+nnoremap gr :action FindUsages<CR>
+
+" Go to implementation
+nnoremap gi :action GotoImplementation<CR>
+
+" Go to type definition
+nnoremap gt :action GotoTypeDeclaration<CR>
+
+" Show hover documentation
+nnoremap K :action QuickJavaDoc<CR>
+
+" Document symbols
+nnoremap <leader>cs :action FileStructurePopup<CR>
+
+" Workspace symbols
+nnoremap <leader>cS :action GotoSymbol<CR>
+
+" Code actions
+nnoremap <leader>ca :action ShowIntentionActions<CR>
+vnoremap <leader>ca :action ShowIntentionActions<CR>
+
+" Rename symbol
+nnoremap <leader>cr :action RenameElement<CR>
+
+" Diagnostic navigation - Errors
+nnoremap [e :action GotoPreviousError<CR>
+nnoremap ]e :action GotoNextError<CR>
+
+" Diagnostic navigation - Warnings/Info/Hints
+nnoremap [d :action GotoPreviousError<CR>
+nnoremap ]d :action GotoNextError<CR>
+
+" ============================================================================
+" LANGUAGE-SPECIFIC - From lua/plugins/coding/lspconfig.lua
+" ============================================================================
+
+" TypeScript - Organize imports
+nnoremap <leader>oi :action OptimizeImports<CR>
+
+" C/C++ - Switch source/header
+nnoremap <leader>ch :action GotoRelated<CR>
+
+" Java (JDTLS equivalents)
+nnoremap <leader>jo :action OptimizeImports<CR>
+nnoremap <leader>jv :action IntroduceVariable<CR>
+vnoremap <leader>jv :action IntroduceVariable<CR>
+nnoremap <leader>jc :action IntroduceConstant<CR>
+vnoremap <leader>jc :action IntroduceConstant<CR>
+vnoremap <leader>jm :action ExtractMethod<CR>
+nnoremap <leader>ju :action Maven.Reimport<CR>
+nnoremap <leader>jt :action RunClass<CR>
+nnoremap <leader>jn :action RunContextPopup<CR>
+
+" ============================================================================
+" FORMATTING - From lua/plugins/coding/conform.lua
+" ============================================================================
+
+" Format buffer or selection
+nnoremap <leader>ff :action ReformatCode<CR>
+vnoremap <leader>ff :action ReformatCode<CR>
+
+" ============================================================================
+" FILE EXPLORER - From lua/plugins/snacks.lua
+" ============================================================================
+
+" Toggle explorer
+nnoremap <leader>ee :NERDTreeToggle<CR>
+
+" Focus explorer on current file
+nnoremap <leader>ef :NERDTreeFind<CR>
+
+" Alternative: Use IntelliJ's Project view
+" nnoremap <leader>ee :action ActivateProjectToolWindow<CR>
+" nnoremap <leader>ef :action SelectInProjectView<CR>
+
+" ============================================================================
+" FILE & BUFFER NAVIGATION - From lua/plugins/snacks.lua
+" ============================================================================
+
+" Search files
+nnoremap <leader><leader> :action GotoFile<CR>
+
+" Search git files
+nnoremap <leader>sg :action GotoFile<CR>
+
+" Search buffers
+nnoremap <leader>sb :action Switcher<CR>
+
+" Search recent files
+nnoremap <leader>so :action RecentFiles<CR>
+
+" ============================================================================
+" SEARCH & GREP - From lua/plugins/snacks.lua
+" ============================================================================
+
+" Search by grep
+nnoremap <leader>/ :action FindInPath<CR>
+
+" Search word under cursor
+nnoremap <leader>sc :action FindWordAtCaret<CR>
+
+" Search WORD under cursor
+nnoremap <leader>sC :action FindWordAtCaret<CR>
+
+" Search visual selection
+vnoremap <leader>sv :action FindInPath<CR>
+
+" Resume last search
+nnoremap <leader>sr :action FindInPath<CR>
+
+" Search diagnostics
+nnoremap <leader>sd :action ActivateProblemsViewToolWindow<CR>
+
+" ============================================================================
+" QUICKFIX & LOCATION LISTS - From lua/plugins/snacks.lua
+" ============================================================================
+
+" Quickfix list
+nnoremap <leader>sq :action ActivateProblemsViewToolWindow<CR>
+
+" Location list (closest equivalent)
+nnoremap <leader>sl :action ActivateProblemsViewToolWindow<CR>
+
+" ============================================================================
+" GIT OPERATIONS - From lua/plugins/snacks.lua & lua/plugins/gitsigns.lua
+" ============================================================================
+
+" Git status
+nnoremap <leader>gs :action VersionControlsToolWindowToolbar<CR>
+
+" Git commits
+nnoremap <leader>gc :action Vcs.Show.Log<CR>
+
+" Git buffer commits (file history)
+nnoremap <leader>gb :action Vcs.ShowTabbedFileHistory<CR>
+
+" Git hunk navigation
+nnoremap ]h :action VcsShowNextChangeMarker<CR>
+nnoremap [h :action VcsShowPrevChangeMarker<CR>
+
+" Git blame
+nnoremap gb :action Annotate<CR>
+nnoremap gB :action Annotate<CR>
+
+" Git stage/reset selection
+vnoremap gs :action Vcs.Show.Local.Changes<CR>
+vnoremap gr :action Vcs.RollbackChangedLines<CR>
+
+" ============================================================================
+" HELP & CONFIGURATION - From lua/plugins/snacks.lua
+" ============================================================================
+
+" Search help tags
+nnoremap <leader>sh :action HelpTopics<CR>
+
+" Search keymaps (which-key style)
+nnoremap <leader>sk :action ShowIntentionActions<CR>
+
+" Search marks
+nnoremap <leader>sm :action ShowBookmarks<CR>
+
+" ============================================================================
+" CODE MANIPULATION - From lua/plugins/treesj.lua
+" ============================================================================
+
+" Toggle split/join (statements, arrays, objects, etc.)
+nnoremap <leader>xt :action EditorJoinLines<CR>
+nnoremap <leader>xT :action EditorJoinLines<CR>
+nnoremap <leader>xj :action EditorJoinLines<CR>
+nnoremap <leader>xs :action EditorSplitLine<CR>
+
+" ============================================================================
+" SURROUND - From lua/plugins/nvim-surround.lua
+" ============================================================================
+" NOTE: These are handled by the 'set surround' plugin
+" Usage remains the same as Neovim:
+"   ys{motion}{char}  - Add surround
+"   yss{char}         - Surround line
+"   yS{motion}{char}  - Surround line-wise
+"   ySS{char}         - Surround whole line
+"   S{char}           - Surround selection (visual)
+"   gS{char}          - Surround linewise (visual)
+"   ds{char}          - Delete surround
+"   cs{old}{new}      - Change surround
+
+" ============================================================================
+" COMPLETION - From lua/plugins/coding/blink-cmp.lua
+" ============================================================================
+" NOTE: IntelliJ handles completion natively
+" The keybindings below work with IntelliJ's completion popup
+
+" Navigate completion menu
+inoremap <C-k> <Up>
+inoremap <C-j> <Down>
+
+" Accept completion
+inoremap <CR> <CR>
+
+" Show completion menu
+inoremap <C-Space> <C-Space>
+
+" Hide completion menu
+inoremap <C-e> <Esc>
+
+" ============================================================================
+" TREESITTER TEXT OBJECTS - From lua/plugins/nvim-treesitter.lua
+" ============================================================================
+
+" Incremental selection (use IntelliJ's extend selection)
+nnoremap <C-space> :action EditorSelectWord<CR>
+vnoremap <C-space> :action EditorSelectWord<CR>
+
+" Decremental selection (shrink selection)
+nnoremap <BS> :action EditorUnSelectWord<CR>
+vnoremap <BS> :action EditorUnSelectWord<CR>
+
+" ============================================================================
+" PLUGIN MANAGER - From lua/core/lazy.lua
+" ============================================================================
+
+" Open plugin manager (IntelliJ plugins)
+nnoremap <leader>ll :action WelcomeScreen.Plugins<CR>
+
+" ============================================================================
+" ADDITIONAL USEFUL IDEAVIM MAPPINGS
+" ============================================================================
+
+" Run/Debug
+nnoremap <leader>rr :action Run<CR>
+nnoremap <leader>rd :action Debug<CR>
+nnoremap <leader>rc :action RunClass<CR>
+nnoremap <leader>rf :action ChooseRunConfiguration<CR>
+nnoremap <leader>rs :action Stop<CR>
+
+" Debugging
+nnoremap <leader>db :action ToggleLineBreakpoint<CR>
+nnoremap <leader>dc :action Resume<CR>
+nnoremap <leader>dn :action StepOver<CR>
+nnoremap <leader>di :action StepInto<CR>
+nnoremap <leader>do :action StepOut<CR>
+nnoremap <leader>de :action EvaluateExpression<CR>
+
+" Refactoring
+nnoremap <leader>ri :action Inline<CR>
+nnoremap <leader>rv :action IntroduceVariable<CR>
+nnoremap <leader>rf :action IntroduceField<CR>
+nnoremap <leader>rm :action ExtractMethod<CR>
+nnoremap <leader>rr :action RenameElement<CR>
+
+" Build & Tools
+nnoremap <leader>bb :action CompileDirty<CR>
+nnoremap <leader>br :action Compile<CR>
+nnoremap <leader>bc :action Build<CR>
+
+" Terminal
+nnoremap <leader>tt :action ActivateTerminalToolWindow<CR>
+
+" Toggle views
+nnoremap <leader>tp :action ActivateProjectToolWindow<CR>
+nnoremap <leader>tr :action ActivateRunToolWindow<CR>
+nnoremap <leader>td :action ActivateDebugToolWindow<CR>
+nnoremap <leader>tg :action ActivateVersionControlToolWindow<CR>
+
+" Tabs/Buffers
+nnoremap <leader>bn :action NextTab<CR>
+nnoremap <leader>bp :action PreviousTab<CR>
+nnoremap <leader>bc :action CloseContent<CR>
+nnoremap <leader>bo :action CloseAllEditorsButActive<CR>
+
+" Zen mode / Distraction free
+nnoremap <leader>z :action ToggleDistractionFreeMode<CR>
+
+" ============================================================================
+" WHICH-KEY CONFIGURATION
+" ============================================================================
+
+let g:WhichKeyDesc_leader = "<leader> Leader key"
+
+" Code actions
+let g:WhichKeyDesc_code = "<leader>c +code"
+let g:WhichKeyDesc_code_action = "<leader>ca Code action"
+let g:WhichKeyDesc_code_diagnostic = "<leader>cd Show diagnostic"
+let g:WhichKeyDesc_code_diagnostic_all = "<leader>cD All diagnostics"
+let g:WhichKeyDesc_code_errors = "<leader>ce Errors"
+let g:WhichKeyDesc_code_warnings = "<leader>cw Warnings"
+let g:WhichKeyDesc_code_virtual_text = "<leader>cv Toggle virtual text"
+let g:WhichKeyDesc_code_rename = "<leader>cr Rename"
+let g:WhichKeyDesc_code_symbols = "<leader>cs Document symbols"
+let g:WhichKeyDesc_code_symbols_workspace = "<leader>cS Workspace symbols"
+let g:WhichKeyDesc_code_header = "<leader>ch Switch header/source"
+
+" Search
+let g:WhichKeyDesc_search = "<leader>s +search"
+let g:WhichKeyDesc_search_files = "<leader><leader> Search files"
+let g:WhichKeyDesc_search_git = "<leader>sg Git files"
+let g:WhichKeyDesc_search_buffers = "<leader>sb Buffers"
+let g:WhichKeyDesc_search_old = "<leader>so Recent files"
+let g:WhichKeyDesc_search_grep = "<leader>/ Grep"
+let g:WhichKeyDesc_search_cursor = "<leader>sc Word under cursor"
+let g:WhichKeyDesc_search_CURSOR = "<leader>sC WORD under cursor"
+let g:WhichKeyDesc_search_visual = "<leader>sv Visual selection"
+let g:WhichKeyDesc_search_resume = "<leader>sr Resume search"
+let g:WhichKeyDesc_search_diagnostics = "<leader>sd Diagnostics"
+let g:WhichKeyDesc_search_quickfix = "<leader>sq Quickfix"
+let g:WhichKeyDesc_search_location = "<leader>sl Location list"
+let g:WhichKeyDesc_search_help = "<leader>sh Help"
+let g:WhichKeyDesc_search_keymaps = "<leader>sk Keymaps"
+let g:WhichKeyDesc_search_marks = "<leader>sm Marks"
+
+" Explorer
+let g:WhichKeyDesc_explorer = "<leader>e +explorer"
+let g:WhichKeyDesc_explorer_toggle = "<leader>ee Toggle explorer"
+let g:WhichKeyDesc_explorer_focus = "<leader>ef Focus explorer"
+
+" Format
+let g:WhichKeyDesc_format = "<leader>f +format"
+let g:WhichKeyDesc_format_buffer = "<leader>ff Format buffer"
+
+" Git
+let g:WhichKeyDesc_git = "<leader>g +git"
+let g:WhichKeyDesc_git_status = "<leader>gs Status"
+let g:WhichKeyDesc_git_commits = "<leader>gc Commits"
+let g:WhichKeyDesc_git_buffer = "<leader>gb Buffer commits"
+
+" Help
+let g:WhichKeyDesc_help = "<leader>h +help"
+let g:WhichKeyDesc_help_help = "<leader>hh Help"
+
+" Java
+let g:WhichKeyDesc_java = "<leader>j +java"
+let g:WhichKeyDesc_java_organize = "<leader>jo Organize imports"
+let g:WhichKeyDesc_java_variable = "<leader>jv Extract variable"
+let g:WhichKeyDesc_java_constant = "<leader>jc Extract constant"
+let g:WhichKeyDesc_java_method = "<leader>jm Extract method"
+let g:WhichKeyDesc_java_update = "<leader>ju Update config"
+let g:WhichKeyDesc_java_test = "<leader>jt Test class"
+let g:WhichKeyDesc_java_test_nearest = "<leader>jn Test nearest"
+
+" Lazy/Plugins
+let g:WhichKeyDesc_lazy = "<leader>l +lazy"
+let g:WhichKeyDesc_lazy_lazy = "<leader>ll Lazy/Plugins"
+
+" Organize imports
+let g:WhichKeyDesc_organize = "<leader>o +organize"
+let g:WhichKeyDesc_organize_imports = "<leader>oi Organize imports"
+
+" Code transformation
+let g:WhichKeyDesc_transform = "<leader>x +transform"
+let g:WhichKeyDesc_transform_toggle = "<leader>xt Toggle split"
+let g:WhichKeyDesc_transform_toggle_recursive = "<leader>xT Toggle split recursive"
+let g:WhichKeyDesc_transform_join = "<leader>xj Join"
+let g:WhichKeyDesc_transform_split = "<leader>xs Split"
+
+" Run
+let g:WhichKeyDesc_run = "<leader>r +run"
+let g:WhichKeyDesc_run_run = "<leader>rr Run"
+let g:WhichKeyDesc_run_debug = "<leader>rd Debug"
+let g:WhichKeyDesc_run_class = "<leader>rc Run class"
+let g:WhichKeyDesc_run_choose = "<leader>rf Choose config"
+let g:WhichKeyDesc_run_stop = "<leader>rs Stop"
+
+" Debug
+let g:WhichKeyDesc_debug = "<leader>d +debug"
+let g:WhichKeyDesc_debug_breakpoint = "<leader>db Toggle breakpoint"
+let g:WhichKeyDesc_debug_continue = "<leader>dc Continue"
+let g:WhichKeyDesc_debug_next = "<leader>dn Step over"
+let g:WhichKeyDesc_debug_into = "<leader>di Step into"
+let g:WhichKeyDesc_debug_out = "<leader>do Step out"
+let g:WhichKeyDesc_debug_eval = "<leader>de Evaluate"
+
+" Refactor
+let g:WhichKeyDesc_refactor = "<leader>r +refactor"
+let g:WhichKeyDesc_refactor_inline = "<leader>ri Inline"
+let g:WhichKeyDesc_refactor_variable = "<leader>rv Introduce variable"
+let g:WhichKeyDesc_refactor_field = "<leader>rf Introduce field"
+let g:WhichKeyDesc_refactor_method = "<leader>rm Extract method"
+let g:WhichKeyDesc_refactor_rename = "<leader>rr Rename"
+
+" Build
+let g:WhichKeyDesc_build = "<leader>b +build"
+let g:WhichKeyDesc_build_dirty = "<leader>bb Build dirty"
+let g:WhichKeyDesc_build_rebuild = "<leader>br Rebuild"
+let g:WhichKeyDesc_build_compile = "<leader>bc Compile"
+let g:WhichKeyDesc_buffer_next = "<leader>bn Next buffer"
+let g:WhichKeyDesc_buffer_prev = "<leader>bp Previous buffer"
+let g:WhichKeyDesc_buffer_close = "<leader>bc Close buffer"
+let g:WhichKeyDesc_buffer_only = "<leader>bo Close others"
+
+" Toggle
+let g:WhichKeyDesc_toggle = "<leader>t +toggle"
+let g:WhichKeyDesc_toggle_terminal = "<leader>tt Terminal"
+let g:WhichKeyDesc_toggle_project = "<leader>tp Project view"
+let g:WhichKeyDesc_toggle_run = "<leader>tr Run view"
+let g:WhichKeyDesc_toggle_debug = "<leader>td Debug view"
+let g:WhichKeyDesc_toggle_git = "<leader>tg Git view"
+
+" Zen mode
+let g:WhichKeyDesc_zen = "<leader>z Zen mode"
+
+" ============================================================================
+" END OF IDEAVIMRC
+" ============================================================================
