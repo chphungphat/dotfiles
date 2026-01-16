@@ -5,23 +5,8 @@ return {
     "nvim-lua/plenary.nvim",
   },
   config = function()
-    local workspaceEnvFolder = os.getenv("WORKSPACE_ENV")
-    if workspaceEnvFolder == nil or workspaceEnvFolder == "" then
-      local possiblePaths = {
-        os.getenv("HOME") .. "/Workspaces/.env",
-        os.getenv("HOME") .. "/Workspaces/environment",
-        os.getenv("HOME") .. "/.local/share/jdtls",
-      }
-      for _, path in ipairs(possiblePaths) do
-        if vim.fn.isdirectory(path .. "/jdtls") == 1 then
-          workspaceEnvFolder = path
-          break
-        end
-      end
-      if workspaceEnvFolder == nil then
-        workspaceEnvFolder = os.getenv("HOME") .. "/Workspaces/.env"
-      end
-    end
+    local jdtlsPath = os.getenv("HOME") .. "/.local/share/jdtls"
+    local jdtlsDataDir = os.getenv("HOME") .. "/.local/share/jdtls-workspaces"
 
     -- Get Java home and version dynamically (sdkman)
     local javaHome = os.getenv("JAVA_HOME")
@@ -213,6 +198,7 @@ return {
       },
     })
 
+    -- clangd
     vim.lsp.enable("clangd")
     vim.lsp.config("clangd", {
       cmd = {
@@ -235,10 +221,8 @@ return {
     })
 
     -- jdtls
-    -- Get jdtls jar paths
-    local lombok_jar = vim.fn.glob(workspaceEnvFolder .. "/jdtls/latest/plugins/lombok*.jar")
-    local launcher_jar =
-        vim.fn.glob(workspaceEnvFolder .. "/jdtls/latest/plugins/org.eclipse.equinox.launcher_*.jar")
+    local lombok_jar = vim.fn.glob(jdtlsPath .. "/plugins/lombok*.jar")
+    local launcher_jar = vim.fn.glob(jdtlsPath .. "/plugins/org.eclipse.equinox.launcher_*.jar")
 
     if lombok_jar == "" or launcher_jar == "" then
       -- vim.notify(
@@ -259,6 +243,11 @@ return {
           "-Dlog.level=ALL",
           "-Xms2g",
           "-Xmx8g",
+          "-XX:+UseG1GC",
+          "-XX:+UseStringDeduplication",
+          "-XX:ConcGCThreads=4",
+          "-XX:ParallelGCThreads=8",
+          "-Dsun.zip.disableMemoryMapping=true",
           "--add-modules=ALL-SYSTEM",
           "--add-opens",
           "java.base/java.util=ALL-UNNAMED",
@@ -268,11 +257,9 @@ return {
           "-jar",
           launcher_jar,
           "-configuration",
-          workspaceEnvFolder .. "/jdtls/latest/config_linux",
+          jdtlsPath .. "/config_linux",
           "-data",
-          workspaceEnvFolder
-          .. "/jdtls/workspaces/"
-          .. vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t"),
+          jdtlsDataDir .. "/" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t"),
         },
         root_dir = vim.fs.dirname(vim.fs.find({
           "build.xml",
@@ -287,13 +274,28 @@ return {
         }, { upward = true })[1]),
         settings = {
           java = {
+            autobuild = {
+              enabled = false, -- Disable autobuild for faster saves
+            },
+            maxConcurrentBuilds = 2,
             eclipse = {
-              downloadSources = true,
+              downloadSources = false, -- Lazy load to speed up import
             },
             maven = {
-              downloadSources = true,
+              downloadSources = false,
             },
-            imports = {
+            import = {
+              generatesMetadataFilesAtProjectRoot = false,
+              exclusions = {
+                "**/build/**",
+                "**/bin/**",
+                "**/out/**",
+                "**/.gradle/**",
+                "**/node_modules/**",
+                "**/.metadata/**",
+                "**/archetype-resources/**",
+                "**/META-INF/maven/**",
+              },
               gradle = {
                 wrapper = {
                   checksums = {
@@ -305,18 +307,17 @@ return {
                 },
               },
             },
+            implementationsCodeLens = {
+              enabled = false, 
+            },
             referencesCodeLens = {
-              enabled = false, -- Disabled for performance on large codebases
+              enabled = false, 
             },
             references = {
               includeDecompiledSources = true,
             },
             format = {
-              enabled = true,
-              settings = {
-                url = vim.fn.stdpath("config") .. "/resources/intellij-java-google-style.xml",
-                profile = "GoogleStyle",
-              },
+              enabled = false,
             },
             signatureHelp = {
               enabled = true,
@@ -472,7 +473,7 @@ return {
     vim.lsp.enable("marksman")
     vim.lsp.config("marksman", {})
 
-    -- OmniSharp for C# / .NET
+    -- OmniSharp
     local omnisharp_bin = os.getenv("HOME") .. "/.local/share/omnisharp/run"
     if vim.fn.executable(omnisharp_bin) == 1 then
       vim.lsp.enable("omnisharp")
