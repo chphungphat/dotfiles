@@ -4,9 +4,9 @@ return {
 		require("fidget").setup({
 			notification = {
 				poll_rate = 10,
-				filter = vim.log.levels.INFO,
+				filter = vim.log.levels.WARN,
 				history_size = 128,
-				override_vim_notify = true,
+				override_vim_notify = false,
 
 				view = {
 					stack_upwards = true,

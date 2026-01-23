@@ -223,6 +223,8 @@ return {
     -- jdtls
     local lombok_jar = vim.fn.glob(jdtlsPath .. "/plugins/lombok*.jar")
     local launcher_jar = vim.fn.glob(jdtlsPath .. "/plugins/org.eclipse.equinox.launcher_*.jar")
+    -- local minio_jar = vim.fn.glob(jdtlsPath .. "/plugins/minio*.jar")
+    -- local other_jar = vim.fn.glob(jdtlsPath .. "/plugins/*.jar")
 
     if lombok_jar == "" or launcher_jar == "" then
       -- vim.notify(
@@ -239,8 +241,8 @@ return {
           "-Declipse.application=org.eclipse.jdt.ls.core.id1",
           "-Dosgi.bundles.defaultStartLevel=4",
           "-Declipse.product=org.eclipse.jdt.ls.core.product",
-          "-Dlog.protocol=true",
-          "-Dlog.level=ALL",
+          "-Dlog.protocol=false",
+          "-Dlog.level=ERROR",
           "-Xms2g",
           "-Xmx8g",
           "-XX:+UseG1GC",
@@ -254,6 +256,8 @@ return {
           "--add-opens",
           "java.base/java.lang=ALL-UNNAMED",
           "-javaagent:" .. lombok_jar,
+          -- "-javaagent:" .. minio_jar,
+          -- "-javaagent:" .. other_jar,
           "-jar",
           launcher_jar,
           "-configuration",
@@ -372,12 +376,18 @@ return {
                 },
               } or {},
             },
+            compile = {
+              nullAnalysis = {
+                mode = "automatic",
+              },
+            },
           },
         },
         init_options = {
           bundles = {},
           extendedClientCapabilities = {
             progressReportProvider = false,
+            -- statusBarProvider = false,
             classFileContentsSupport = true,
             generateToStringPromptSupport = true,
             hashCodeEqualsPromptSupport = true,
