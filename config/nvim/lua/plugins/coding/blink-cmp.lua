@@ -15,11 +15,12 @@ return {
       ["<CR>"] = { "accept", "fallback" },
       ["<C-Space>"] = { "show", "fallback" },
       ["<C-e>"] = { "hide", "fallback" },
+      ["<C-d>"] = { "scroll_documentation_down", "fallback" },
+      ["<C-u>"] = { "scroll_documentation_up", "fallback" },
     },
 
     sources = {
       default = { "lsp", "path", "buffer", "lazydev" },
-      min_keyword_length = 1,
 
       providers = {
         lazydev = {
@@ -32,7 +33,7 @@ return {
 
     completion = {
       accept = {
-        auto_brackets = { enabled = false },
+        auto_brackets = { enabled = true },
       },
 
       list = {
@@ -52,8 +53,8 @@ return {
         },
       },
 
-
       menu = {
+        auto_show = true,
         border = "rounded",
         draw = {
           columns = {
@@ -66,6 +67,8 @@ return {
 
       ghost_text = { enabled = false },
     },
+
+    signature = { enabled = true },
 
     appearance = {
       use_nvim_cmp_as_default = true,

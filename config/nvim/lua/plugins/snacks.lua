@@ -25,14 +25,28 @@ return {
           hidden = false,
           no_ignore = false,
         },
+        explorer = {
+          hidden = true,
+          ignored = false,
+          tree = true,
+          git_status = true,
+          diagnostics = true,
+          follow_file = true,
+          layout = { preset = "sidebar", preview = false },
+        },
       },
     },
     explorer = {
       enabled = true,
       replace_netrw = true,
+      trash = true,
     },
     bigfile = { enabled = true },
-    notifier = { enabled = true },
+    notifier = {
+      enabled = true,
+      timeout = 3000,
+    },
+    lazygit = { enabled = true },
     quickfile = { enabled = true },
     statuscolumn = { enabled = true },
     words = { enabled = true },
@@ -49,9 +63,19 @@ return {
     {
       "<leader>ef",
       function()
-        require("snacks").explorer.open({ focus = true })
+        local snacks = require("snacks")
+        snacks.explorer.open({ focus = true })
       end,
-      desc = "Focus Explorer on Current File",
+      desc = "Open and Focus Explorer",
+    },
+
+    -- Git
+    {
+      "<leader>gg",
+      function()
+        require("snacks").lazygit()
+      end,
+      desc = "Lazygit",
     },
 
     -- File and buffer navigation
