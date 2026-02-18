@@ -3,6 +3,8 @@ return {
   event = { "BufReadPre", "BufNewFile" },
   dependencies = {
     "nvim-lua/plenary.nvim",
+    "mfussenegger/nvim-jdtls",
+    "Hoffs/omnisharp-extended-lsp.nvim",
   },
   config = function()
     local jdtlsPath = os.getenv("HOME") .. "/.local/share/jdtls"
@@ -31,26 +33,26 @@ return {
         local opts = { buffer = event.buf, silent = true }
 
         vim.keymap.set("n", "gd", function()
-          require("snacks").picker.lsp_definitions()
+          require("fzf-lua").lsp_definitions()
         end, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
         vim.keymap.set("n", "gD", function()
-          require("snacks").picker.lsp_declarations()
+          require("fzf-lua").lsp_declarations()
         end, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
         vim.keymap.set("n", "gr", function()
-          require("snacks").picker.lsp_references()
+          require("fzf-lua").lsp_references()
         end, vim.tbl_extend("force", opts, { desc = "Show references" }))
         vim.keymap.set("n", "gi", function()
-          require("snacks").picker.lsp_implementations()
+          require("fzf-lua").lsp_implementations()
         end, vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
         vim.keymap.set("n", "gt", function()
-          require("snacks").picker.lsp_type_definitions()
+          require("fzf-lua").lsp_typedefs()
         end, vim.tbl_extend("force", opts, { desc = "Go to type definition" }))
 
         vim.keymap.set("n", "<leader>cs", function()
-          require("snacks").picker.lsp_symbols()
+          require("fzf-lua").lsp_document_symbols()
         end, vim.tbl_extend("force", opts, { desc = "Document symbols" }))
         vim.keymap.set("n", "<leader>cS", function()
-          require("snacks").picker.lsp_workspace_symbols()
+          require("fzf-lua").lsp_workspace_symbols()
         end, vim.tbl_extend("force", opts, { desc = "Workspace symbols" }))
 
         vim.keymap.set(
@@ -187,13 +189,63 @@ return {
       settings = {
         typescript = {
           inlayHints = {
-            includeInlayParameterNameHints = "literal",
-            includeInlayParameterNameHintsWhenArgumentMatchesName = false,
-            includeInlayFunctionParameterTypeHints = false,
-            includeInlayVariableTypeHints = false,
-            includeInlayPropertyDeclarationTypeHints = false,
-            includeInlayFunctionLikeReturnTypeHints = false,
-            includeInlayEnumMemberValueHints = false,
+            includeInlayParameterNameHints = "all",
+            includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+            includeInlayFunctionParameterTypeHints = true,
+            includeInlayVariableTypeHints = true,
+            includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+            includeInlayPropertyDeclarationTypeHints = true,
+            includeInlayFunctionLikeReturnTypeHints = true,
+            includeInlayEnumMemberValueHints = true,
+          },
+          suggest = {
+            includeCompletionsForModuleExports = true,
+            includeCompletionsForImportStatements = true,
+            includeCompletionsWithInsertText = true,
+            includeCompletionsWithSnippetText = true,
+            includeAutomaticOptionalChainCompletions = true,
+          },
+          preferences = {
+            includePackageJsonAutoImports = "auto",
+            importModuleSpecifier = "shortest",
+            importModuleSpecifierEnding = "auto",
+            quoteStyle = "auto",
+            useAliasesForRenames = true,
+          },
+          updateImportsOnFileMove = {
+            enabled = "always",
+          },
+          workspaceSymbols = {
+            scope = "allOpenProjects",
+          },
+        },
+        javascript = {
+          inlayHints = {
+            includeInlayParameterNameHints = "all",
+            includeInlayParameterNameHintsWhenArgumentMatchesName = true,
+            includeInlayFunctionParameterTypeHints = true,
+            includeInlayVariableTypeHints = true,
+            includeInlayVariableTypeHintsWhenTypeMatchesName = false,
+            includeInlayPropertyDeclarationTypeHints = true,
+            includeInlayFunctionLikeReturnTypeHints = true,
+            includeInlayEnumMemberValueHints = true,
+          },
+          suggest = {
+            includeCompletionsForModuleExports = true,
+            includeCompletionsForImportStatements = true,
+            includeCompletionsWithInsertText = true,
+            includeCompletionsWithSnippetText = true,
+            includeAutomaticOptionalChainCompletions = true,
+          },
+          preferences = {
+            includePackageJsonAutoImports = "auto",
+            importModuleSpecifier = "shortest",
+            importModuleSpecifierEnding = "auto",
+            quoteStyle = "auto",
+            useAliasesForRenames = true,
+          },
+          updateImportsOnFileMove = {
+            enabled = "always",
           },
         },
       },
@@ -224,16 +276,12 @@ return {
     -- jdtls
     local lombok_jar = vim.fn.glob(jdtlsPath .. "/plugins/lombok*.jar")
     local launcher_jar = vim.fn.glob(jdtlsPath .. "/plugins/org.eclipse.equinox.launcher_*.jar")
-    -- local minio_jar = vim.fn.glob(jdtlsPath .. "/plugins/minio*.jar")
-    -- local other_jar = vim.fn.glob(jdtlsPath .. "/plugins/*.jar")
 
     if lombok_jar == "" or launcher_jar == "" then
-      -- vim.notify(
-      --   "jdtls not properly configured. Missing jars at: "
-      --   .. workspaceEnvFolder
-      --   .. "/jdtls/latest/plugins/",
-      --   vim.log.levels.WARN
-      -- )
+      vim.notify(
+        "jdtls not properly configured. Missing jars at: ",
+        vim.log.levels.WARN
+      )
     else
       vim.lsp.enable("jdtls")
       vim.lsp.config("jdtls", {
@@ -257,8 +305,6 @@ return {
           "--add-opens",
           "java.base/java.lang=ALL-UNNAMED",
           "-javaagent:" .. lombok_jar,
-          -- "-javaagent:" .. minio_jar,
-          -- "-javaagent:" .. other_jar,
           "-jar",
           launcher_jar,
           "-configuration",
@@ -279,6 +325,11 @@ return {
         }, { upward = true })[1]),
         settings = {
           java = {
+            -- inlayHints = {
+            --   parameterNames = {
+            --     enabled = "all",
+            --   },
+            -- },
             autobuild = {
               enabled = false, -- Disable autobuild for faster saves
             },
@@ -313,16 +364,24 @@ return {
               },
             },
             implementationsCodeLens = {
-              enabled = false, 
+              enabled = false,
             },
             referencesCodeLens = {
-              enabled = false, 
+              enabled = false,
             },
             references = {
               includeDecompiledSources = true,
             },
             format = {
               enabled = false,
+              -- Use project settings (.editorconfig) instead of Google style
+              settings = {
+                url = "",            -- Empty URL = respect project's editorconfig
+                profile = "Default", -- Use default profile
+              },
+              -- Sync with Neovim's buffer settings dynamically
+              insertSpaces = vim.bo.expandtab,                            -- Use spaces if expandtab is set
+              tabSize = vim.bo.shiftwidth > 0 and vim.bo.shiftwidth or 2, -- Respect shiftwidth
             },
             signatureHelp = {
               enabled = true,
@@ -347,11 +406,13 @@ return {
                 "jdk.*",
                 "sun.*",
               },
+              -- Import order matching Spotless: importOrder("\\#", "", "java|javax")
+              -- Static imports first, then all other imports, then java/javax
               importOrder = {
-                "java",
-                "javax",
-                "com",
-                "org",
+                "#",     -- Static imports
+                "",      -- All other imports (third-party: com, org, etc.)
+                "java",  -- java packages
+                "javax", -- javax packages
               },
             },
             sources = {
@@ -442,8 +503,8 @@ return {
           vim.keymap.set(
             "n",
             "<leader>ju",
-            "<Cmd>lua require('jdtls').update_project_config()<CR>",
-            opts
+            "<Cmd>JdtWipeDataAndRestart<CR>",
+            vim.tbl_extend("force", opts, { desc = "Wipe workspace and restart (fixes dependency issues)" })
           )
           vim.keymap.set("n", "<leader>jt", "<Cmd>lua require('jdtls').test_class()<CR>", opts)
           vim.keymap.set(
@@ -452,6 +513,43 @@ return {
             "<Cmd>lua require('jdtls').test_nearest_method()<CR>",
             opts
           )
+
+          vim.keymap.set(
+            "n",
+            "<leader>js",
+            "<Cmd>lua require('jdtls').super_implementation()<CR>",
+            vim.tbl_extend("force", opts, { desc = "Go to super implementation" })
+          )
+          vim.keymap.set(
+            "n",
+            "<leader>jb",
+            "<Cmd>JdtBytecode<CR>",
+            vim.tbl_extend("force", opts, { desc = "View bytecode (helps understand performance/JVM behavior)" })
+          )
+          vim.keymap.set(
+            "n",
+            "<leader>jh",
+            "<Cmd>JdtJshell<CR>",
+            vim.tbl_extend("force", opts, { desc = "Open JShell (interactive Java REPL for quick testing)" })
+          )
+
+          -- Setup DAP (Debug Adapter Protocol) if nvim-dap is installed
+          -- This enables debugging Java applications with breakpoints, step-through, etc.
+          local dap_ok, dap = pcall(require, "dap")
+          if dap_ok then
+            dap.configurations.java = {
+              {
+                type = "java",
+                request = "attach",
+                name = "Debug (Attach) - Remote",
+                hostName = "127.0.0.1",
+                port = 5005, -- Standard Java debug port
+              },
+            }
+            -- Enable hot code replacement during debugging (apply code changes without restart)
+            require("jdtls").setup_dap({ hotcodereplace = "auto" })
+            require("jdtls.dap").setup_dap_main_class_configs()
+          end
         end,
       })
     end
@@ -461,7 +559,7 @@ return {
       settings = {
         format = false,
         experimental = {
-          useFlatConfig = true, 
+          useFlatConfig = true,
         },
       },
     })
@@ -484,40 +582,66 @@ return {
     vim.lsp.enable("marksman")
     vim.lsp.config("marksman", {})
 
-    -- OmniSharp
+    vim.lsp.enable("dockerls")
+    vim.lsp.config("dockerls", {})
+
+    vim.lsp.enable("docker_compose_language_service")
+    vim.lsp.config("docker_compose_language_service", {})
+
+    vim.lsp.enable("taplo")
+    vim.lsp.config("taplo", {})
+
+    vim.lsp.enable("gitlab_ci_ls")
+    vim.lsp.config("gitlab_ci_ls", {})
+
+    -- OmniSharp with Extended LSP support
+    -- Using Neovim 0.11+ vim.lsp.config() API to override default omnisharp config
     local omnisharp_bin = os.getenv("HOME") .. "/.local/share/omnisharp/run"
     if vim.fn.executable(omnisharp_bin) == 1 then
-      vim.lsp.enable("omnisharp")
+      -- Override the default omnisharp config from nvim-lspconfig/lsp/omnisharp.lua
       vim.lsp.config("omnisharp", {
         cmd = {
           omnisharp_bin,
-          "--languageserver",
+          "-z", -- https://github.com/OmniSharp/omnisharp-vscode/pull/4300
           "--hostPID",
           tostring(vim.fn.getpid()),
+          "DotNet:enablePackageRestore=false",
+          "--encoding",
+          "utf-8",
+          "--languageserver",
         },
-        root_dir = vim.fs.dirname(vim.fs.find({
-          "*.sln",
-          "*.csproj",
-          "omnisharp.json",
-          "function.json",
-          ".git",
-        }, { upward = true })[1]),
+        capabilities = capabilities,
         settings = {
           FormattingOptions = {
             EnableEditorConfigSupport = true,
             OrganizeImports = true,
           },
           MsBuild = {
-            LoadProjectsOnDemand = false,
+            LoadProjectsOnDemand = true,
           },
           RoslynExtensionsOptions = {
             EnableAnalyzersSupport = true,
             EnableImportCompletion = true,
             AnalyzeOpenDocumentsOnly = true,
+            EnableDecompilationSupport = true,
           },
           Sdk = {
             IncludePrereleases = true,
           },
+        },
+        handlers = {
+          ["textDocument/definition"] = function(...)
+            return require("omnisharp_extended").handler(...)
+          end,
+          ["textDocument/typeDefinition"] = function(...)
+            return require("omnisharp_extended").handler(...)
+          end,
+          ["textDocument/references"] = function(...)
+            return require("omnisharp_extended").handler(...)
+          end,
+          ["textDocument/implementation"] = function(...)
+            return require("omnisharp_extended").handler(...)
+          end,
         },
         on_attach = function(client, bufnr)
           local opts = { buffer = bufnr, noremap = true, silent = true }
@@ -538,11 +662,14 @@ return {
           )
         end,
       })
+
+      -- Enable omnisharp LSP
+      vim.lsp.enable("omnisharp")
     else
-      -- vim.notify(
-      --   "OmniSharp not found at: " .. omnisharp_bin .. "\nInstall with: curl -sL https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v1.39.15/omnisharp-linux-x64-net6.0.tar.gz | tar xz -C ~/.local/share/omnisharp",
-      --   vim.log.levels.WARN
-      -- )
+      vim.notify(
+        "OmniSharp not found at: " .. omnisharp_bin .. "\nInstall with: curl -sL https://github.com/OmniSharp/omnisharp-roslyn/releases/latest/download/omnisharp-linux-x64-net6.0.tar.gz | tar xz -C ~/.local/share/omnisharp",
+        vim.log.levels.WARN
+      )
     end
   end,
 }

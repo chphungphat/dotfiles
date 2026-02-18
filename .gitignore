@@ -1,6 +1,8 @@
 config/tmux/plugins
 config/tmux/resurrect-saves
 
+config/alacritty/themes
+
 tt.*
 .tests
 doc/tags

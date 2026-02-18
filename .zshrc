@@ -77,7 +77,7 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git z zsh-autosuggestions fast-syntax-highlighting)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -110,28 +110,45 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+eval $(keychain --eval --quiet --agents ssh ~/.ssh/github_ed25519 ~/.ssh/id_ed25519 ~/.ssh/nexpando_ed25519 ~/.ssh/qt_id_rsa)
+
 alias nv='nvim .'
 
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+export GIT_EDITOR=vim
+
+alias lzg='lazygit'
+alias lzd='lazydocker'
+
+alias fd='fdfind'
+alias fda='fdfind --absolute-path'
+
+alias gpc='globalprotect connect --gaeteway ZTNA-GW-GDS'
+alias gps='globalprotect show --status'
+alias gpd='globalprotect disconnect'
+alias gpcp='globalprotect connect --gateway ZTNA-GW-CMC'
+
+. "$HOME/.cargo/env"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-export PATH="${HOME}/.local/bin":${PATH}
 
-export GIT_EDITOR=vim
+# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
+[[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+export PATH="$HOME/.local/bin:$PATH"
 
-alias tmsave='./.dotfiles/config/tmux/restore-session.sh'
-
-alias lzg='lazygit'
-alias lzd='lazydocker'
+# bun completions
+[ -s "/home/reyon/.bun/_bun" ] && source "/home/reyon/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
-export WORKSPACE_ENV="${HOME}/Workspaces/.environment"
+# Mise Activate
+eval "$(~/.local/bin/mise activate zsh)"
+
+# Load Harlequin database connections
+[[ -f ~/.harlequin-connectors ]] && source ~/.harlequin-connectors
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
