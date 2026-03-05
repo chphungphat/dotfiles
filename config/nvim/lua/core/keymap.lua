@@ -40,6 +40,10 @@ vim.keymap.set("n", "<leader>ce", function()
   })
 end, { desc = "Show errors in quickfix" })
 
+-- Log viewing
+vim.keymap.set("n", "<leader>lL", "<cmd>LspLog<CR>", { desc = "Open LSP log" })
+vim.keymap.set("n", "<leader>lm", "<cmd>messages<CR>", { desc = "Show messages" })
+
 -- Toggle diagnostic virtual text
 vim.keymap.set("n", "<leader>cv", function()
   local current_config = vim.diagnostic.config()

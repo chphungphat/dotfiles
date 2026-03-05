@@ -45,7 +45,7 @@ bindings = [
   # Alt+backspace deletes whole words
   { key = "Back", mods = "Alt", chars = "\u001b\u007f" },
   # Alt+left/right sends Ctrl+arrow sequences for word navigation
-  { key = "Left",  mods = "Alt", chars = "\u001b[1;5D" },
+  { key = "Left", mods = "Alt", chars = "\u001b[1;5D" },
   { key = "Right", mods = "Alt", chars = "\u001b[1;5C" },
 ]
 

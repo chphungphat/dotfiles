@@ -38,7 +38,10 @@ return {
         "vim",
         "vimdoc",
         "query",
+
+        "astro"
       })
+
 
       -- Configure folding
       vim.opt.foldmethod = "expr"
@@ -128,40 +131,99 @@ return {
         end,
       })
 
-      -- Incremental selection configuration
-      vim.keymap.set("n", "<M-Up>", function()
+      -- Incremental selection configuration (native vim.treesitter API)
+      local function select_node_range(node)
+        local sr, sc, er, ec = node:range()
+        vim.api.nvim_win_set_cursor(0, { sr + 1, sc })
         vim.cmd("normal! v")
-        local ts_utils = require("nvim-treesitter.ts_utils")
-        local node = ts_utils.get_node_at_cursor()
-        if node then
-          node = node:parent()
-          if node then
-            ts_utils.update_selection(0, node)
+        vim.api.nvim_win_set_cursor(0, { er + 1, math.max(ec - 1, 0) })
+      end
+
+      local function get_covering_node(sr, sc, er, ec)
+        local node = vim.treesitter.get_node({ pos = { sr, sc } })
+        while node do
+          local nr, nc, ner, nec = node:range()
+          if nr <= sr and nc <= sc and (ner > er or (ner == er and nec >= ec)) then
+            return node
           end
+          node = node:parent()
         end
+      end
+
+      vim.keymap.set("n", "<M-Up>", function()
+        local node = vim.treesitter.get_node()
+        if not node then return end
+        local parent = node:parent()
+        if not parent then return end
+        select_node_range(parent)
       end, { desc = "Increment selection to parent node" })
 
       vim.keymap.set("v", "<M-Up>", function()
-        local ts_utils = require("nvim-treesitter.ts_utils")
-        local node = ts_utils.get_node_at_cursor()
-        if node then
-          node = node:parent()
-          if node then
-            ts_utils.update_selection(0, node)
-          end
-        end
+        local vstart = vim.fn.getpos("v")
+        local vcur = vim.fn.getpos(".")
+        local sr = math.min(vstart[2], vcur[2]) - 1
+        local sc = math.min(vstart[3], vcur[3]) - 1
+        local er = math.max(vstart[2], vcur[2]) - 1
+        local ec = math.max(vstart[3], vcur[3])
+        local covering = get_covering_node(sr, sc, er, ec)
+        local parent = covering and covering:parent()
+        if not parent then return end
+        local psr, psc, per, pec = parent:range()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+        vim.schedule(function()
+          vim.api.nvim_win_set_cursor(0, { psr + 1, psc })
+          vim.cmd("normal! v")
+          vim.api.nvim_win_set_cursor(0, { per + 1, math.max(pec - 1, 0) })
+        end)
       end, { desc = "Increment selection to parent node" })
 
       vim.keymap.set("v", "<M-Down>", function()
-        local ts_utils = require("nvim-treesitter.ts_utils")
-        local node = ts_utils.get_node_at_cursor()
-        if node then
-          local children = ts_utils.get_named_children(node)
-          if #children > 0 then
-            ts_utils.update_selection(0, children[1])
-          end
-        end
+        local vstart = vim.fn.getpos("v")
+        local vcur = vim.fn.getpos(".")
+        local sr = math.min(vstart[2], vcur[2]) - 1
+        local sc = math.min(vstart[3], vcur[3]) - 1
+        local er = math.max(vstart[2], vcur[2]) - 1
+        local ec = math.max(vstart[3], vcur[3])
+        local covering = get_covering_node(sr, sc, er, ec)
+        if not covering then return end
+        local child = covering:named_child(0)
+        if not child then return end
+        local csr, csc, cer, cec = child:range()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+        vim.schedule(function()
+          vim.api.nvim_win_set_cursor(0, { csr + 1, csc })
+          vim.cmd("normal! v")
+          vim.api.nvim_win_set_cursor(0, { cer + 1, math.max(cec - 1, 0) })
+        end)
       end, { desc = "Decrement selection to child node" })
+
+      -- <C-space> incremental selection (replaces old nvim-treesitter.configs incremental_selection)
+      -- First press: select the node at cursor (e.g. just "method" in "text.method()")
+      -- Subsequent presses in visual mode: expand to parent (e.g. "text.method()")
+      vim.keymap.set("n", "<C-space>", function()
+        local node = vim.treesitter.get_node()
+        if not node then return end
+        select_node_range(node)
+      end, { desc = "Select current treesitter node" })
+
+      vim.keymap.set("v", "<C-space>", function()
+        local vstart = vim.fn.getpos("v")
+        local vcur = vim.fn.getpos(".")
+        local sr = math.min(vstart[2], vcur[2]) - 1
+        local sc = math.min(vstart[3], vcur[3]) - 1
+        local er = math.max(vstart[2], vcur[2]) - 1
+        local ec = math.max(vstart[3], vcur[3])
+        local covering = get_covering_node(sr, sc, er, ec)
+        local parent = covering and covering:parent()
+        if not parent then return end
+        local psr, psc, per, pec = parent:range()
+        vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+        vim.schedule(function()
+          vim.api.nvim_win_set_cursor(0, { psr + 1, psc })
+          vim.cmd("normal! v")
+          vim.api.nvim_win_set_cursor(0, { per + 1, math.max(pec - 1, 0) })
+        end)
+      end, { desc = "Expand selection to parent node" })
 
       -- Setup nvim-treesitter-textobjects
       local ts_textobjects_ok, ts_textobjects = pcall(require, "nvim-treesitter-textobjects")

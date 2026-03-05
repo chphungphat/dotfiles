@@ -1,22 +1,12 @@
 return {
   "kylechui/nvim-surround",
   event = { "BufReadPre", "BufNewFile" },
+  init = function()
+    -- Disable insert-mode surrounds (set before plugin loads)
+    vim.g.nvim_surround_no_insert_mappings = true
+  end,
   config = function()
     require("nvim-surround").setup({
-      keymaps = {
-        insert = false,
-        insert_line = false,
-        normal = "ys",           -- ys{motion}{char} - add surround
-        normal_cur = "yss",      -- yss{char} - surround line
-        normal_line = "yS",      -- yS{motion}{char} - surround line-wise
-        normal_cur_line = "ySS", -- ySS{char} - surround whole line
-        visual = "S",            -- S{char} - surround selection
-        visual_line = "gS",      -- gS{char} - surround linewise
-        delete = "ds",           -- ds{char} - delete surround
-        change = "cs",           -- cs{old}{new} - change surround
-        change_line = "cS",      -- cS{old}{new} - change surround linewise
-      },
-
       surrounds = {
         -- Markdown code blocks
         ["c"] = {

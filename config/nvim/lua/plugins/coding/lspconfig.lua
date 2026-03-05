@@ -55,12 +55,9 @@ return {
           require("fzf-lua").lsp_workspace_symbols()
         end, vim.tbl_extend("force", opts, { desc = "Workspace symbols" }))
 
-        vim.keymap.set(
-          { "n", "v" },
-          "<leader>ca",
-          vim.lsp.buf.code_action,
-          vim.tbl_extend("force", opts, { desc = "Code actions" })
-        )
+        vim.keymap.set({ "n", "v" }, "<leader>ca", function()
+          require("fzf-lua").lsp_code_actions()
+        end, vim.tbl_extend("force", opts, { desc = "Code actions" }))
         vim.keymap.set(
           "n",
           "<leader>cr",
@@ -533,8 +530,6 @@ return {
             vim.tbl_extend("force", opts, { desc = "Open JShell (interactive Java REPL for quick testing)" })
           )
 
-          -- Setup DAP (Debug Adapter Protocol) if nvim-dap is installed
-          -- This enables debugging Java applications with breakpoints, step-through, etc.
           local dap_ok, dap = pcall(require, "dap")
           if dap_ok then
             dap.configurations.java = {
@@ -543,7 +538,7 @@ return {
                 request = "attach",
                 name = "Debug (Attach) - Remote",
                 hostName = "127.0.0.1",
-                port = 5005, -- Standard Java debug port
+                port = 5005,
               },
             }
             -- Enable hot code replacement during debugging (apply code changes without restart)
@@ -593,6 +588,15 @@ return {
 
     vim.lsp.enable("gitlab_ci_ls")
     vim.lsp.config("gitlab_ci_ls", {})
+
+    vim.lsp.enable("astro")
+    vim.lsp.config("astro", {
+      init_options = {
+        typescript = {
+          tsdk = "/home/reyon/.nvm/versions/node/v22.22.0/lib/node_modules/typescript/lib"
+        },
+      },
+    })
 
     -- OmniSharp with Extended LSP support
     -- Using Neovim 0.11+ vim.lsp.config() API to override default omnisharp config
@@ -667,7 +671,9 @@ return {
       vim.lsp.enable("omnisharp")
     else
       vim.notify(
-        "OmniSharp not found at: " .. omnisharp_bin .. "\nInstall with: curl -sL https://github.com/OmniSharp/omnisharp-roslyn/releases/latest/download/omnisharp-linux-x64-net6.0.tar.gz | tar xz -C ~/.local/share/omnisharp",
+        "OmniSharp not found at: " ..
+        omnisharp_bin ..
+        "\nInstall with: curl -sL https://github.com/OmniSharp/omnisharp-roslyn/releases/latest/download/omnisharp-linux-x64-net6.0.tar.gz | tar xz -C ~/.local/share/omnisharp",
         vim.log.levels.WARN
       )
     end

@@ -48,6 +48,17 @@ return {
 
       -- Smart format on save - only when formatters are available
       format_on_save = function(bufnr)
+        if vim.g.disable_autoformat then
+          return
+        end
+
+        -- Skip filetypes with no formatter configured (avoids broken LSP fallback)
+        local ft = vim.bo[bufnr].filetype
+        local no_format_fts = { kotlin = true, groovy = true, java = true }
+        if no_format_fts[ft] then
+          return
+        end
+
         -- Skip for large files (>1MB)
         local max_filesize = 1024 * 1024
         local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(bufnr))
@@ -128,9 +139,7 @@ return {
         },
       },
 
-      format_after_save = {
-        lsp_fallback = true,
-      },
+      format_after_save = nil,
 
       notify_on_error = true,
       notify_no_formatters = false,
