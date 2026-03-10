@@ -80,6 +80,7 @@ return {
           "lua",
           "markdown",
           "vim",
+          "astro",
         },
         callback = function()
           local buf = vim.api.nvim_get_current_buf()

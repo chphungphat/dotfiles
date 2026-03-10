@@ -6,8 +6,6 @@ vim.opt.relativenumber = true
 
 vim.opt.clipboard = "unnamedplus"
 
-vim.opt.completeopt = "menuone,noselect,popup"
-
 vim.opt.mouse = "a"
 vim.opt.showmode = false
 
@@ -57,15 +55,11 @@ vim.g.loaded_netrwPlugin = 1
 
 vim.o.laststatus = 3
 
-vim.o.lazyredraw = true
-
 vim.g.loaded_node_provider = 0
 vim.g.loaded_perl_provider = 0
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
 
 vim.opt.pumheight = 15
-
-vim.opt.ttyfast = true
 
 vim.opt.regexpengine = 0

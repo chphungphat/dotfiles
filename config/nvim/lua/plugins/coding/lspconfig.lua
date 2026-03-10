@@ -2,7 +2,6 @@ return {
   "neovim/nvim-lspconfig",
   event = { "BufReadPre", "BufNewFile" },
   dependencies = {
-    "nvim-lua/plenary.nvim",
     "mfussenegger/nvim-jdtls",
     "Hoffs/omnisharp-extended-lsp.nvim",
   },
@@ -135,31 +134,6 @@ return {
           )
         end
       end,
-    })
-
-    vim.diagnostic.config({
-      virtual_text = {
-        spacing = 4,
-        prefix = "●",
-        source = "if_many",
-      },
-      signs = {
-        text = {
-          [vim.diagnostic.severity.ERROR] = "",
-          [vim.diagnostic.severity.WARN] = "",
-          [vim.diagnostic.severity.INFO] = "",
-          [vim.diagnostic.severity.HINT] = "",
-        },
-      },
-      underline = true,
-      update_in_insert = false,
-      severity_sort = true,
-      float = {
-        border = "rounded",
-        source = true,
-        header = "",
-        prefix = "",
-      },
     })
 
     vim.lsp.config("*", {
@@ -590,13 +564,18 @@ return {
     vim.lsp.config("gitlab_ci_ls", {})
 
     vim.lsp.enable("astro")
-    vim.lsp.config("astro", {
-      init_options = {
-        typescript = {
-          tsdk = "/home/reyon/.nvm/versions/node/v22.22.0/lib/node_modules/typescript/lib"
-        },
-      },
-    })
+    local node_path = vim.fn.exepath("node")
+    if node_path ~= "" then
+      local node_dir = vim.fn.fnamemodify(vim.fn.resolve(node_path), ":h:h")
+      local tsdk = node_dir .. "/lib/node_modules/typescript/lib"
+      if vim.uv.fs_stat(tsdk) then
+        vim.lsp.config("astro", {
+          init_options = {
+            typescript = { tsdk = tsdk },
+          },
+        })
+      end
+    end
 
     -- OmniSharp with Extended LSP support
     -- Using Neovim 0.11+ vim.lsp.config() API to override default omnisharp config
@@ -667,7 +646,6 @@ return {
         end,
       })
 
-      -- Enable omnisharp LSP
       vim.lsp.enable("omnisharp")
     else
       vim.notify(

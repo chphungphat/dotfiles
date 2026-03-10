@@ -20,3 +20,5 @@ config/pnvim
 .claude
 CLAUDE.md
 .serena
+
+docs/superpowers
