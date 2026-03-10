@@ -32,31 +32,31 @@ return {
         local opts = { buffer = event.buf, silent = true }
 
         vim.keymap.set("n", "gd", function()
-          require("fzf-lua").lsp_definitions()
+          Snacks.picker.lsp_definitions()
         end, vim.tbl_extend("force", opts, { desc = "Go to definition" }))
-        vim.keymap.set("n", "gD", function()
-          require("fzf-lua").lsp_declarations()
-        end, vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
+        vim.keymap.set("n", "gD",
+          vim.lsp.buf.declaration,
+          vim.tbl_extend("force", opts, { desc = "Go to declaration" }))
         vim.keymap.set("n", "gr", function()
-          require("fzf-lua").lsp_references()
+          Snacks.picker.lsp_references()
         end, vim.tbl_extend("force", opts, { desc = "Show references" }))
         vim.keymap.set("n", "gi", function()
-          require("fzf-lua").lsp_implementations()
+          Snacks.picker.lsp_implementations()
         end, vim.tbl_extend("force", opts, { desc = "Go to implementation" }))
         vim.keymap.set("n", "gt", function()
-          require("fzf-lua").lsp_typedefs()
+          Snacks.picker.lsp_type_definitions()
         end, vim.tbl_extend("force", opts, { desc = "Go to type definition" }))
 
         vim.keymap.set("n", "<leader>cs", function()
-          require("fzf-lua").lsp_document_symbols()
+          Snacks.picker.lsp_symbols()
         end, vim.tbl_extend("force", opts, { desc = "Document symbols" }))
         vim.keymap.set("n", "<leader>cS", function()
-          require("fzf-lua").lsp_workspace_symbols()
+          Snacks.picker.lsp_workspace_symbols()
         end, vim.tbl_extend("force", opts, { desc = "Workspace symbols" }))
 
-        vim.keymap.set({ "n", "v" }, "<leader>ca", function()
-          require("fzf-lua").lsp_code_actions()
-        end, vim.tbl_extend("force", opts, { desc = "Code actions" }))
+        vim.keymap.set({ "n", "v" }, "<leader>ca",
+          vim.lsp.buf.code_action,
+          vim.tbl_extend("force", opts, { desc = "Code actions" }))
         vim.keymap.set(
           "n",
           "<leader>cr",
