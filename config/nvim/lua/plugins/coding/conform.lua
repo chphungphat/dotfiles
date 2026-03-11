@@ -91,24 +91,32 @@ return {
         prettier = {
           command = "prettier",
           condition = function(_, ctx)
-            local cwd = vim.fs.dirname(ctx.filename)
             local prettier_files = {
               ".prettierrc", ".prettierrc.json", ".prettierrc.js",
-              ".prettierrc.yml", ".prettierrc.yaml", "prettier.config.js"
+              ".prettierrc.yml", ".prettierrc.yaml", "prettier.config.js",
+              "prettier.config.mjs", "prettier.config.cjs",
             }
 
-            for _, file in ipairs(prettier_files) do
-              if vim.uv.fs_stat(cwd .. "/" .. file) ~= nil then
-                return true
-              end
+            -- Walk up the directory tree to find prettier config
+            local found = vim.fs.find(prettier_files, {
+              path = ctx.dirname,
+              upward = true,
+              stop = vim.uv.os_homedir(),
+            })
+            if #found > 0 then
+              return true
             end
 
-            local package_json = cwd .. "/package.json"
-            if vim.uv.fs_stat(package_json) ~= nil then
-              local ok, content = pcall(vim.fn.readfile, package_json)
+            -- Check for "prettier" key in nearest package.json
+            local pkg = vim.fs.find("package.json", {
+              path = ctx.dirname,
+              upward = true,
+              stop = vim.uv.os_homedir(),
+            })
+            if #pkg > 0 then
+              local ok, content = pcall(vim.fn.readfile, pkg[1])
               if ok and content then
-                local json_str = table.concat(content, "\n")
-                return json_str:match('"prettier"') ~= nil
+                return table.concat(content, "\n"):match('"prettier"') ~= nil
               end
             end
 
@@ -118,9 +126,11 @@ return {
 
         stylua = {
           condition = function(_, ctx)
-            local cwd = vim.fs.dirname(ctx.filename)
-            return vim.uv.fs_stat(cwd .. "/stylua.toml") ~= nil or
-                vim.uv.fs_stat(cwd .. "/.stylua.toml") ~= nil
+            return #vim.fs.find({ "stylua.toml", ".stylua.toml" }, {
+              path = ctx.dirname,
+              upward = true,
+              stop = vim.uv.os_homedir(),
+            }) > 0
           end,
         },
 
