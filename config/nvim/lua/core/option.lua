@@ -1,5 +1,4 @@
 vim.g.have_nerd_font = true
-vim.o.termguicolors = true
 
 vim.opt.number = true
 vim.opt.relativenumber = true
@@ -63,3 +62,5 @@ vim.g.loaded_ruby_provider = 0
 vim.opt.pumheight = 15
 
 vim.opt.regexpengine = 0
+
+vim.o.jumpoptions = "view"

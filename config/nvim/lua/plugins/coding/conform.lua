@@ -44,6 +44,7 @@ return {
 
         -- C#
         cs = { "csharpier" },
+        typ = { "tinymist" },
       },
 
       -- Smart format on save - only when formatters are available
@@ -81,7 +82,7 @@ return {
         end
 
         return {
-          timeout_ms = 1000,
+          timeout_ms = 3000,
           lsp_fallback = true,
           quiet = true,
         }
@@ -92,9 +93,24 @@ return {
           command = "prettier",
           condition = function(_, ctx)
             local prettier_files = {
-              ".prettierrc", ".prettierrc.json", ".prettierrc.js",
-              ".prettierrc.yml", ".prettierrc.yaml", "prettier.config.js",
-              "prettier.config.mjs", "prettier.config.cjs",
+              ".prettierrc",
+              ".prettierrc.json",
+              ".prettierrc.json5",
+              ".prettierrc.js",
+              ".prettierrc.cjs",
+              ".prettierrc.mjs",
+              ".prettierrc.ts",
+              ".prettierrc.mts",
+              ".prettierrc.cts",
+              ".prettierrc.yml",
+              ".prettierrc.yaml",
+              ".prettierrc.toml",
+              "prettier.config.js",
+              "prettier.config.cjs",
+              "prettier.config.mjs",
+              "prettier.config.ts",
+              "prettier.config.mts",
+              "prettier.config.cts",
             }
 
             -- Walk up the directory tree to find prettier config
@@ -107,7 +123,7 @@ return {
               return true
             end
 
-            -- Check for "prettier" key in nearest package.json
+            -- Check for top-level "prettier" config key in nearest package.json
             local pkg = vim.fs.find("package.json", {
               path = ctx.dirname,
               upward = true,
@@ -116,7 +132,10 @@ return {
             if #pkg > 0 then
               local ok, content = pcall(vim.fn.readfile, pkg[1])
               if ok and content then
-                return table.concat(content, "\n"):match('"prettier"') ~= nil
+                local json_ok, data = pcall(vim.json.decode, table.concat(content, "\n"))
+                if json_ok and type(data) == "table" and data.prettier ~= nil then
+                  return true
+                end
               end
             end
 
@@ -141,9 +160,9 @@ return {
         clang_format = {
           condition = function(_, ctx)
             local cwd = vim.fs.dirname(ctx.filename)
-            return vim.uv.fs_stat(cwd .. "/.clang-format") ~= nil or
-                vim.uv.fs_stat(cwd .. "/_clang-format") ~= nil or
-                vim.uv.fs_stat(vim.fn.getcwd() .. "/.clang-format") ~= nil
+            return vim.uv.fs_stat(cwd .. "/.clang-format") ~= nil
+              or vim.uv.fs_stat(cwd .. "/_clang-format") ~= nil
+              or vim.uv.fs_stat(vim.fn.getcwd() .. "/.clang-format") ~= nil
           end,
           args = { "--style=file" }, -- Use .clang-format file in project
         },

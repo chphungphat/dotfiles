@@ -66,6 +66,7 @@ return {
           "css",
           "scss",
           "bash",
+          "sh",
           "c",
           "cs",
           "java",

@@ -1,3 +1,9 @@
+vim.filetype.add({
+  pattern = {
+    ["%.env%.[%w_.-]+"] = "sh",
+  },
+})
+
 vim.api.nvim_create_autocmd("TextYankPost", {
   desc = "Highlight yanking text",
   group = vim.api.nvim_create_augroup("highlight-yank", { clear = true }),
@@ -33,27 +39,6 @@ vim.api.nvim_create_autocmd({ "WinLeave", "BufLeave" }, {
   group = cursorline_group,
   callback = function()
     vim.wo.cursorline = false
-  end,
-})
-
-vim.api.nvim_create_autocmd("ColorScheme", {
-  group = vim.api.nvim_create_augroup("DiagnosticColors", { clear = true }),
-  callback = function()
-    if vim.g.colors_name == "gruvbox-material" then
-      vim.api.nvim_set_hl(0, "DiagnosticError", { fg = "#ea6962" })
-      vim.api.nvim_set_hl(0, "DiagnosticWarn", { fg = "#d8a657" })
-      vim.api.nvim_set_hl(0, "DiagnosticInfo", { fg = "#7daea3" })
-      vim.api.nvim_set_hl(0, "DiagnosticHint", { fg = "#a9b665" })
-
-      vim.api.nvim_set_hl(0, "DiagnosticVirtualTextError", { fg = "#ea6962", bg = "#3c2526" })
-      vim.api.nvim_set_hl(0, "DiagnosticVirtualTextWarn", { fg = "#d8a657", bg = "#3c3526" })
-      vim.api.nvim_set_hl(0, "DiagnosticVirtualTextInfo", { fg = "#7daea3", bg = "#263c3a" })
-      vim.api.nvim_set_hl(0, "DiagnosticVirtualTextHint", { fg = "#a9b665", bg = "#2e3c26" })
-    end
-
-    local bg = vim.g.colors_name == "gruvbox-material" and "#3c3836" or "#2a2a37"
-    vim.api.nvim_set_hl(0, "CursorLine", { bg = bg })
-    vim.api.nvim_set_hl(0, "CursorLineNr", { fg = "#fabd2f", bold = true })
   end,
 })
 

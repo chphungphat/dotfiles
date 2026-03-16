@@ -523,7 +523,6 @@ return {
       })
     end
 
-    vim.lsp.enable("eslint")
     vim.lsp.config("eslint", {
       settings = {
         format = false,
@@ -562,6 +561,9 @@ return {
 
     vim.lsp.enable("gitlab_ci_ls")
     vim.lsp.config("gitlab_ci_ls", {})
+
+    vim.lsp.enable('tinymist')
+    vim.lsp.config('tinymist', {})
 
     vim.lsp.enable("astro")
     local node_path = vim.fn.exepath("node")

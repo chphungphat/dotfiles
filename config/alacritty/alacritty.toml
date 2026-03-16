@@ -1,5 +1,5 @@
 [general]
-import = ["~/.config/alacritty/themes/themes/gruvbox_material_hard_dark.toml"]
+import = ["~/.config/alacritty/themes/themes/afterglow.toml"]
 
 [env]
 TERM = "alacritty"
