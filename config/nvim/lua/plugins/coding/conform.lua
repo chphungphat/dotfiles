@@ -44,7 +44,7 @@ return {
 
         -- C#
         cs = { "csharpier" },
-        typ = { "prettypst" },
+        -- typst = { "prettypst" },
       },
 
       -- Smart format on save - only when formatters are available

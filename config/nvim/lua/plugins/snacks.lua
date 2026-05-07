@@ -34,6 +34,7 @@ return {
         easing = "linear",
       },
     },
+    zen = { enabled = true },
     explorer = { enabled = true },
     picker = {
       enabled = true,
@@ -261,6 +262,15 @@ return {
         Snacks.rename.rename_file()
       end,
       desc = "Rename File",
+    },
+
+    -- Zoom
+    {
+      "<leader>z",
+      function()
+        Snacks.zen.zoom()
+      end,
+      desc = "Toggle Zoom",
     },
 
     -- Lazygit

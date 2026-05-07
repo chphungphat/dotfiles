@@ -8,7 +8,7 @@ return {
       { flavor = "mocha", name = "Gruvbox", key = "1", bg = "dark" },
       { flavor = "macchiato", name = "Everforest", key = "2", bg = "dark" },
       { flavor = "frappe", name = "RosePine", key = "3", bg = "dark" },
-      { flavor = "latte", name = "Solarized", key = "4", bg = "light" },
+      { flavor = "latte", name = "Lotus", key = "4", bg = "light" },
     }
 
     local function switch_theme(flavor, name, bg)
@@ -134,37 +134,38 @@ return {
         },
 
         ---------------------------------------------------------------
-        -- Solarized Light
-        -- Eye relief: warm cream background, muted accents
-        -- Ref: community solarized light port
+        -- Lotus (Kanagawa Light + community warm cream)
+        -- Eye relief: warm amber background, high-contrast text
+        -- Ref: Kanagawa lotus accent (#c37339) used for lavender
+        --      to fix cursor visibility (was purple → now amber)
         ---------------------------------------------------------------
         latte = {
-          rosewater = "#fdf7e8",
-          flamingo = "#cb4b16",
-          pink = "#d33682",
-          mauve = "#6c71c4",
-          red = "#dc322f",
-          maroon = "#c03260",
-          peach = "#cb4b1f",
-          yellow = "#b58900",
-          green = "#859900",
-          teal = "#2aa198",
-          sky = "#2398d2",
-          sapphire = "#0077b3",
-          blue = "#268bd2",
-          lavender = "#7b88d3",
-          text = "#657b83",
-          subtext1 = "#586e75",
-          subtext0 = "#073642",
-          overlay2 = "#002b36",
-          overlay1 = "#839496",
-          overlay0 = "#93a1a1",
-          surface2 = "#eee8d5",
-          surface1 = "#ebecef",
-          surface0 = "#ccd0da",
-          base = "#fdf6e3",
-          mantle = "#f7f1dc",
-          crust = "#f5ecd7",
+          rosewater = "#c4626a",
+          flamingo = "#c84053",
+          pink = "#a8458c",
+          mauve = "#6c2eb5",
+          red = "#b83b4a",
+          maroon = "#a04a6a",
+          peach = "#d04a00",
+          yellow = "#8a5500",
+          green = "#2a6e1a",
+          teal = "#107070",
+          sky = "#4a78a8",
+          sapphire = "#3d5a8a",
+          blue = "#4e4895",
+          lavender = "#b86c00", -- was #7c6aa0 (purple); amber fixes cursor color
+          text = "#1a1008",     -- was #2d2018; darker for more contrast
+          subtext1 = "#38220e", -- warmened from #4b3628
+          subtext0 = "#4c3018", -- warmened from #5d4a3d
+          overlay2 = "#5c4820", -- warmened from #6e5e52 (was gray)
+          overlay1 = "#6e5a2c", -- warmened from #817268
+          overlay0 = "#806c38", -- warmened from #93867e
+          surface2 = "#967e46", -- warmened from #9a8e85 (was gray)
+          surface1 = "#ae9858", -- warmened from #aca298
+          surface0 = "#c6b06a", -- warmened from #bfb6ad (gray-beige → amber)
+          base = "#e8d89a",     -- was #EBDBB2; deeper amber parchment
+          mantle = "#dac880",   -- was #E5D5A0
+          crust = "#ccba68",    -- was #D5C68E
         },
       },
 
