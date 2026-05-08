@@ -24,6 +24,8 @@ return {
       return
     end
 
+    local workspaceDir = jdtlsDataDir .. "/" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
+
     vim.lsp.enable("jdtls")
     vim.lsp.config("jdtls", {
       cmd = {
@@ -51,7 +53,7 @@ return {
         "-configuration",
         jdtlsPath .. "/config_linux",
         "-data",
-        jdtlsDataDir .. "/" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":p:h:t"),
+        workspaceDir,
       },
       root_dir = vim.fs.dirname(vim.fs.find({
         "build.xml",
@@ -168,8 +170,26 @@ return {
           inferSelectionSupport = { "extractMethod", "extractVariable", "extractConstant" },
         },
       },
-      on_attach = function(_, bufnr)
+    })
+
+    vim.api.nvim_create_autocmd("LspAttach", {
+      group = vim.api.nvim_create_augroup("JdtlsAttach", { clear = true }),
+      callback = function(event)
+        local client = vim.lsp.get_client_by_id(event.data.client_id)
+        if not client or client.name ~= "jdtls" then return end
+
+        local bufnr = event.buf
         local opts = { buffer = bufnr, noremap = true, silent = true }
+
+        vim.api.nvim_buf_create_user_command(bufnr, "JdtWipeWorkspace", function()
+          local ok = vim.fn.confirm("Wipe jdtls workspace at:\n" .. workspaceDir, "&Yes\n&No", 2)
+          if ok ~= 1 then return end
+          for _, c in ipairs(vim.lsp.get_clients({ name = "jdtls" })) do
+            c:stop()
+          end
+          vim.fn.delete(workspaceDir, "rf")
+          vim.defer_fn(function() vim.cmd("edit") end, 500)
+        end, { desc = "Wipe jdtls workspace and restart" })
 
         vim.keymap.set("n", "<leader>jo", "<Cmd>lua require('jdtls').organize_imports()<CR>", opts)
         vim.keymap.set("n", "<leader>jv", "<Cmd>lua require('jdtls').extract_variable()<CR>", opts)
@@ -178,8 +198,8 @@ return {
         vim.keymap.set("v", "<leader>jc", "<Esc><Cmd>lua require('jdtls').extract_constant(true)<CR>", opts)
         vim.keymap.set("v", "<leader>jm", "<Esc><Cmd>lua require('jdtls').extract_method(true)<CR>", opts)
         vim.keymap.set(
-          "n", "<leader>ju", "<Cmd>JdtWipeDataAndRestart<CR>",
-          vim.tbl_extend("force", opts, { desc = "Wipe workspace and restart (fixes dependency issues)" })
+          "n", "<leader>ju", "<Cmd>JdtWipeWorkspace<CR>",
+          vim.tbl_extend("force", opts, { desc = "Wipe workspace and restart" })
         )
         vim.keymap.set("n", "<leader>jt", "<Cmd>lua require('jdtls').test_class()<CR>", opts)
         vim.keymap.set("n", "<leader>jn", "<Cmd>lua require('jdtls').test_nearest_method()<CR>", opts)
