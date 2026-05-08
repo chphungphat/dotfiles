@@ -281,12 +281,5 @@ return {
       end,
       desc = "Lazygit",
     },
-    {
-      "<leader>gz",
-      function()
-        Snacks.lazygit()
-      end,
-      desc = "Lazygit",
-    },
   },
 }

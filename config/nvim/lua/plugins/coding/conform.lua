@@ -6,7 +6,7 @@ return {
     {
       "<leader>ff",
       function()
-        require("conform").format({ async = true, lsp_fallback = true })
+        require("conform").format({ async = true, lsp_format = "fallback" })
       end,
       mode = { "n", "v" },
       desc = "Format buffer or selection",
@@ -83,7 +83,7 @@ return {
 
         return {
           timeout_ms = 3000,
-          lsp_fallback = true,
+          lsp_format = "fallback",
           quiet = true,
         }
       end,
@@ -185,7 +185,7 @@ return {
           ["end"] = { args.line2, end_line:len() },
         }
       end
-      require("conform").format({ async = true, lsp_fallback = true, range = range })
+      require("conform").format({ async = true, lsp_format = "fallback", range = range })
     end, { range = true, desc = "Format buffer or range" })
 
     vim.api.nvim_create_user_command("FormatToggle", function()

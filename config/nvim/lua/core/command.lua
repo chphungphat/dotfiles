@@ -1,4 +1,7 @@
 vim.filetype.add({
+  extension = {
+    cshtml = "razor",
+  },
   pattern = {
     ["%.env%.[%w_.-]+"] = "sh",
   },

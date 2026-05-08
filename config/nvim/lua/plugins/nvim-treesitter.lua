@@ -7,6 +7,9 @@ return {
       "nvim-treesitter/nvim-treesitter-textobjects",
     },
     config = function()
+      -- Razor/CSHTML has no dedicated treesitter parser; reuse html for markup highlighting.
+      vim.treesitter.language.register("html", "razor")
+
       -- Install parsers
       require("nvim-treesitter").install({
         -- Core web/scripting languages
@@ -82,6 +85,7 @@ return {
           "markdown",
           "vim",
           "astro",
+          "razor",
         },
         callback = function()
           local buf = vim.api.nvim_get_current_buf()
