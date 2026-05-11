@@ -26,151 +26,150 @@ return {
 
     local workspaceDir = jdtlsDataDir .. "/" .. vim.fn.fnamemodify(vim.fn.getcwd(), ":t")
 
-    vim.lsp.enable("jdtls")
-    vim.lsp.config("jdtls", {
-      cmd = {
-        "java",
-        "-Declipse.application=org.eclipse.jdt.ls.core.id1",
-        "-Dosgi.bundles.defaultStartLevel=4",
-        "-Declipse.product=org.eclipse.jdt.ls.core.product",
-        "-Dlog.protocol=false",
-        "-Dlog.level=ERROR",
-        "-Xms2g",
-        "-Xmx8g",
-        "-XX:+UseG1GC",
-        "-XX:+UseStringDeduplication",
-        "-XX:ConcGCThreads=4",
-        "-XX:ParallelGCThreads=8",
-        "-Dsun.zip.disableMemoryMapping=true",
-        "--add-modules=ALL-SYSTEM",
-        "--add-opens",
-        "java.base/java.util=ALL-UNNAMED",
-        "--add-opens",
-        "java.base/java.lang=ALL-UNNAMED",
-        "-javaagent:" .. lombok_jar,
-        "-jar",
-        launcher_jar,
-        "-configuration",
-        jdtlsPath .. "/config_linux",
-        "-data",
-        workspaceDir,
-      },
-      root_dir = vim.fs.dirname(vim.fs.find({
-        "build.xml",
-        "pom.xml",
-        ".gradlew",
-        ".gitignore",
-        "mvnw",
-        "build.gradle",
-        "build.gradle.kts",
-        "settings.gradle",
-        "settings.gradle.kts",
-      }, { upward = true })[1]),
-      settings = {
-        java = {
-          autobuild = { enabled = false },
-          maxConcurrentBuilds = 2,
-          eclipse = { downloadSources = false },
-          maven = { downloadSources = false },
-          import = {
-            generatesMetadataFilesAtProjectRoot = false,
-            exclusions = {
-              "**/build/**",
-              "**/bin/**",
-              "**/out/**",
-              "**/.gradle/**",
-              "**/node_modules/**",
-              "**/.metadata/**",
-              "**/archetype-resources/**",
-              "**/META-INF/maven/**",
-            },
-            gradle = {
-              wrapper = {
-                checksums = {
-                  {
-                    sha256 = "e68185c8c0f67873dcd98916621870266a71584dfb0a2861d87d7077ebc39837",
-                    allowed = true,
+    local function make_config()
+      return {
+        cmd = {
+          "java",
+          "-Declipse.application=org.eclipse.jdt.ls.core.id1",
+          "-Dosgi.bundles.defaultStartLevel=4",
+          "-Declipse.product=org.eclipse.jdt.ls.core.product",
+          "-Dlog.protocol=false",
+          "-Dlog.level=ERROR",
+          "-Xms2g",
+          "-Xmx8g",
+          "-XX:+UseG1GC",
+          "-XX:+UseStringDeduplication",
+          "-XX:ConcGCThreads=4",
+          "-XX:ParallelGCThreads=8",
+          "-Dsun.zip.disableMemoryMapping=true",
+          "--add-modules=ALL-SYSTEM",
+          "--add-opens",
+          "java.base/java.util=ALL-UNNAMED",
+          "--add-opens",
+          "java.base/java.lang=ALL-UNNAMED",
+          "-javaagent:" .. lombok_jar,
+          "-jar",
+          launcher_jar,
+          "-configuration",
+          jdtlsPath .. "/config_linux",
+          "-data",
+          workspaceDir,
+        },
+        root_dir = vim.fs.dirname(vim.fs.find({
+          "build.xml",
+          "pom.xml",
+          ".gradlew",
+          ".gitignore",
+          "mvnw",
+          "build.gradle",
+          "build.gradle.kts",
+          "settings.gradle",
+          "settings.gradle.kts",
+        }, { upward = true })[1]),
+        settings = {
+          java = {
+            autobuild = { enabled = false },
+            maxConcurrentBuilds = 2,
+            eclipse = { downloadSources = false },
+            maven = { downloadSources = false },
+            import = {
+              generatesMetadataFilesAtProjectRoot = false,
+              exclusions = {
+                "**/build/**",
+                "**/bin/**",
+                "**/out/**",
+                "**/.gradle/**",
+                "**/node_modules/**",
+                "**/.metadata/**",
+                "**/archetype-resources/**",
+                "**/META-INF/maven/**",
+              },
+              gradle = {
+                wrapper = {
+                  checksums = {
+                    {
+                      sha256 = "e68185c8c0f67873dcd98916621870266a71584dfb0a2861d87d7077ebc39837",
+                      allowed = true,
+                    },
                   },
                 },
               },
             },
-          },
-          implementationsCodeLens = { enabled = false },
-          referencesCodeLens = { enabled = false },
-          references = { includeDecompiledSources = true },
-          format = {
-            enabled = false,
-            settings = {
-              url = "",
-              profile = "Default",
-            },
-            insertSpaces = vim.bo.expandtab,
-            tabSize = vim.bo.shiftwidth > 0 and vim.bo.shiftwidth or 2,
-          },
-          signatureHelp = { enabled = true },
-          contentProvider = { preferred = "fernflower" },
-          completion = {
-            favoriteStaticMembers = {
-              "org.hamcrest.MatcherAssert.assertThat",
-              "org.hamcrest.Matchers.*",
-              "org.hamcrest.CoreMatchers.*",
-              "org.junit.jupiter.api.Assertions.*",
-              "java.util.Objects.requireNonNull",
-              "java.util.Objects.requireNonNullElse",
-              "org.mockito.Mockito.*",
-            },
-            filteredTypes = {
-              "com.sun.*",
-              "io.micrometer.shaded.*",
-              "java.awt.*",
-              "jdk.*",
-              "sun.*",
-            },
-            importOrder = { "#", "", "java", "javax" },
-          },
-          sources = {
-            organizeImports = {
-              starThreshold = 9999,
-              staticStarThreshold = 9999,
-            },
-          },
-          codeGeneration = {
-            toString = {
-              template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
-            },
-            hashCodeEquals = { useJava7Objects = true },
-            useBlocks = true,
-          },
-          configuration = {
-            runtimes = javaHome and javaVersion and {
-              {
-                name = "JavaSE-" .. javaVersion,
-                path = javaHome,
+            implementationsCodeLens = { enabled = false },
+            referencesCodeLens = { enabled = false },
+            references = { includeDecompiledSources = true },
+            format = {
+              enabled = false,
+              settings = {
+                url = "",
+                profile = "Default",
               },
-            } or {},
-          },
-          compile = {
-            nullAnalysis = { mode = "automatic" },
+              insertSpaces = vim.bo.expandtab,
+              tabSize = vim.bo.shiftwidth > 0 and vim.bo.shiftwidth or 2,
+            },
+            signatureHelp = { enabled = true },
+            contentProvider = { preferred = "fernflower" },
+            completion = {
+              favoriteStaticMembers = {
+                "org.hamcrest.MatcherAssert.assertThat",
+                "org.hamcrest.Matchers.*",
+                "org.hamcrest.CoreMatchers.*",
+                "org.junit.jupiter.api.Assertions.*",
+                "java.util.Objects.requireNonNull",
+                "java.util.Objects.requireNonNullElse",
+                "org.mockito.Mockito.*",
+              },
+              filteredTypes = {
+                "com.sun.*",
+                "io.micrometer.shaded.*",
+                "java.awt.*",
+                "jdk.*",
+                "sun.*",
+              },
+              importOrder = { "#", "", "java", "javax" },
+            },
+            sources = {
+              organizeImports = {
+                starThreshold = 9999,
+                staticStarThreshold = 9999,
+              },
+            },
+            codeGeneration = {
+              toString = {
+                template = "${object.className}{${member.name()}=${member.value}, ${otherMembers}}",
+              },
+              hashCodeEquals = { useJava7Objects = true },
+              useBlocks = true,
+            },
+            configuration = {
+              runtimes = javaHome and javaVersion and {
+                {
+                  name = "JavaSE-" .. javaVersion,
+                  path = javaHome,
+                },
+              } or {},
+            },
+            compile = {
+              nullAnalysis = { mode = "automatic" },
+            },
           },
         },
-      },
-      init_options = {
-        bundles = {},
-        extendedClientCapabilities = {
-          progressReportProvider = false,
-          classFileContentsSupport = true,
-          generateToStringPromptSupport = true,
-          hashCodeEqualsPromptSupport = true,
-          advancedExtractRefactoringSupport = true,
-          advancedOrganizeImportsSupport = true,
-          generateConstructorsPromptSupport = true,
-          generateDelegateMethodsPromptSupport = true,
-          moveRefactoringSupport = true,
-          overrideMethodsPromptSupport = true,
-          inferSelectionSupport = { "extractMethod", "extractVariable", "extractConstant" },
+        init_options = {
+          bundles = {},
+          extendedClientCapabilities = require("jdtls").extendedClientCapabilities,
         },
-      },
+      }
+    end
+
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "java",
+      group = vim.api.nvim_create_augroup("JdtlsSetup", { clear = true }),
+      callback = function()
+        require("jdtls").start_or_attach(make_config())
+      end,
     })
+
+    require("jdtls").start_or_attach(make_config())
 
     vim.api.nvim_create_autocmd("LspAttach", {
       group = vim.api.nvim_create_augroup("JdtlsAttach", { clear = true }),

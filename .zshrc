@@ -1,3 +1,5 @@
+# Add deno completions to search path
+if [[ ":$FPATH:" != *":/home/reyon/.zsh/completions:"* ]]; then export FPATH="/home/reyon/.zsh/completions:$FPATH"; fi
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -110,9 +112,9 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-eval $(keychain --eval --quiet --agents ssh ~/.ssh/github_ed25519 ~/.ssh/id_ed25519 ~/.ssh/nexpando_ed25519 ~/.ssh/qt_id_rsa)
+# eval $(keychain --eval --quiet --agents ssh ~/.ssh/github_ed25519 ~/.ssh/id_ed25519 ~/.ssh/nexpando_ed25519 ~/.ssh/qt_id_rsa ~/.ssh/vnshop_v2_ed25519)
 
-alias nv='nvim .'
+alias nv='nvim'
 
 export GIT_EDITOR=vim
 
@@ -144,12 +146,42 @@ export PATH="$HOME/.local/bin:$PATH"
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
 
+export PATH="$PATH:/home/reyon/.dotnet/tools"
+
 # Mise Activate
 eval "$(~/.local/bin/mise activate zsh)"
 
 # Load Harlequin database connections
 [[ -f ~/.harlequin-connectors ]] && source ~/.harlequin-connectors
 
+# place this after nvm initialization!
+autoload -U add-zsh-hook
+
+load-nvmrc() {
+  local nvmrc_path
+  nvmrc_path="$(nvm_find_nvmrc)"
+
+  if [ -n "$nvmrc_path" ]; then
+    local nvmrc_node_version
+    nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+
+    if [ "$nvmrc_node_version" = "N/A" ]; then
+      nvm install
+    elif [ "$nvmrc_node_version" != "$(nvm version)" ]; then
+      nvm use --silent
+    fi
+  elif [ -n "$(PWD=$OLDPWD nvm_find_nvmrc)" ] && [ "$(nvm version)" != "$(nvm version default)" ]; then
+    nvm use default --silent
+  fi
+}
+
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
+
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+
+# opencode
+export PATH=/home/reyon/.opencode/bin:$PATH
+. "/home/reyon/.deno/env"
