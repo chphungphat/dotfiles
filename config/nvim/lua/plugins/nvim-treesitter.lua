@@ -48,8 +48,8 @@ return {
         "query",
 
         "astro",
-
-        "env"
+        "env",
+        "regex",
       })
 
 
