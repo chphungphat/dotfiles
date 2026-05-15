@@ -45,6 +45,13 @@ vim.api.nvim_create_autocmd({ "WinLeave", "BufLeave" }, {
   end,
 })
 
+vim.api.nvim_create_user_command("LangInfo", function()
+  local ft = vim.bo.filetype
+  local ok, parser = pcall(vim.treesitter.get_parser, 0)
+  local lang = ok and parser and parser:lang() or "none"
+  vim.notify(string.format("filetype: %s  |  parser: %s", ft, lang), vim.log.levels.INFO)
+end, { desc = "Show filetype and active treesitter parser" })
+
 vim.o.background = "dark"
 
 vim.diagnostic.config({

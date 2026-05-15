@@ -2,13 +2,18 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
-    lazy = false, -- nvim-treesitter does not support lazy-loading
+    lazy = false,
     dependencies = {
       "nvim-treesitter/nvim-treesitter-textobjects",
     },
     config = function()
       -- Razor/CSHTML has no dedicated treesitter parser; reuse html for markup highlighting.
       vim.treesitter.language.register("html", "razor")
+
+      -- Neovim filetype names differ from treesitter parser names for these:
+      --   .tsx/.jsx → filetypes "typescriptreact"/"javascriptreact" → tsx parser
+      vim.treesitter.language.register("tsx", "typescriptreact")
+      vim.treesitter.language.register("tsx", "javascriptreact")
 
       -- Install parsers
       require("nvim-treesitter").install({
@@ -42,7 +47,9 @@ return {
         "vimdoc",
         "query",
 
-        "astro"
+        "astro",
+
+        "env"
       })
 
 
@@ -64,7 +71,8 @@ return {
         pattern = {
           "javascript",
           "typescript",
-          "tsx",
+          "typescriptreact",
+          "javascriptreact",
           "html",
           "css",
           "scss",
