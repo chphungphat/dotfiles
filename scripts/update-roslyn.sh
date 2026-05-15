@@ -63,9 +63,20 @@ unzip -o "$TMP_ZIP" -d "$INSTALL_DIR"
 # 5. Make the server binary executable (zip stores it as 644)
 chmod +x "$BINARY"
 
-# 6. Verify
-echo "Installed Roslyn $(cat "$VERSION_FILE")"
-if [[ -d "$INSTALL_DIR/.razorExtension" ]]; then
+# 6. Write the GitHub tag as the canonical version (the zip's RoslynVersion.txt contains
+#    an internal build label that differs from the release tag, breaking the skip check).
+echo "$ROSLYN_VERSION" > "$VERSION_FILE"
+
+# 7. Newer releases ship razor files at the zip root instead of in a .razorExtension/
+#    subdirectory. Create a symlink so roslyn.nvim's config can still find them.
+RAZOR_EXT="$INSTALL_DIR/.razorExtension"
+if [[ ! -d "$RAZOR_EXT" ]] && [[ -f "$INSTALL_DIR/Microsoft.VisualStudioCode.RazorExtension.dll" ]]; then
+  ln -sf "$INSTALL_DIR" "$RAZOR_EXT"
+fi
+
+# 8. Verify
+echo "Installed Roslyn $ROSLYN_VERSION"
+if [[ -d "$RAZOR_EXT" ]]; then
   echo "Razor extension: present"
 else
   echo "WARNING: .razorExtension not found — Razor/CSHTML support will be unavailable" >&2
