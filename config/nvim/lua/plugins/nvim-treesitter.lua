@@ -14,6 +14,7 @@ return {
       --   .tsx/.jsx → filetypes "typescriptreact"/"javascriptreact" → tsx parser
       vim.treesitter.language.register("tsx", "typescriptreact")
       vim.treesitter.language.register("tsx", "javascriptreact")
+      vim.treesitter.language.register("env", "bash")
 
       -- Install parsers
       require("nvim-treesitter").install({
@@ -48,7 +49,6 @@ return {
         "query",
 
         "astro",
-        "env",
         "regex",
       })
 
