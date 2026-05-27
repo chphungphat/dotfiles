@@ -30,70 +30,49 @@ return {
       capabilities = require("blink.cmp").get_lsp_capabilities(capabilities)
     end
 
+    -- Razor support is built into the server since 5.8.0-1.26262.10; no extensions needed.
+    vim.lsp.config("roslyn", {
+      capabilities = capabilities,
+      settings = {
+        ["csharp|background_analysis"] = {
+          dotnet_analyzer_diagnostics_scope = "openFiles",
+          dotnet_compiler_diagnostics_scope = "openFiles",
+        },
+        ["csharp|inlay_hints"] = {
+          dotnet_enable_inlay_hints_for_parameters = true,
+          dotnet_enable_inlay_hints_for_literal_parameters = false,
+          dotnet_enable_inlay_hints_for_indexer_parameters = false,
+          dotnet_enable_inlay_hints_for_object_creation_parameters = false,
+          dotnet_enable_inlay_hints_for_other_parameters = true,
+          dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
+          dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
+          dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
+        },
+        ["csharp|completion"] = {
+          dotnet_provide_regex_completions = true,
+          dotnet_show_completion_items_from_unimported_namespaces = true,
+          dotnet_show_name_completion_suggestions = true,
+        },
+        ["csharp|code_lens"] = {
+          dotnet_enable_references_code_lens = false,
+          dotnet_enable_tests_code_lens = false,
+        },
+      },
+      on_attach = function(_, bufnr)
+        local opts = { buffer = bufnr, noremap = true, silent = true }
+        vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+        vim.keymap.set("n", "<leader>co", function()
+          vim.lsp.buf.code_action({
+            apply = true,
+            context = { only = { "source.organizeImports" }, diagnostics = {} },
+          })
+        end, vim.tbl_extend("force", opts, { desc = "Organize Imports (C#)" }))
+      end,
+    })
+
     require("roslyn").setup({
       broad_search = false,
       lock_target = true,
-      extensions = {
-        razor = {
-          enabled = true,
-          config = function()
-            local razor_ext = vim.fn.expand("~/.local/share/roslyn/.razorExtension")
-            if vim.fn.isdirectory(razor_ext) == 0 then
-              return { path = nil }
-            end
-            return {
-              path = vim.fs.joinpath(razor_ext, "Microsoft.VisualStudioCode.RazorExtension.dll"),
-              args = {
-                "--razorSourceGenerator="
-                  .. vim.fs.joinpath(razor_ext, "Microsoft.CodeAnalysis.Razor.Compiler.dll"),
-                "--razorDesignTimePath=" .. vim.fs.joinpath(
-                  razor_ext,
-                  "Targets",
-                  "Microsoft.NET.Sdk.Razor.DesignTime.targets"
-                ),
-              },
-            }
-          end,
-        },
-      },
-      config = {
-        capabilities = capabilities,
-        settings = {
-          ["csharp|background_analysis"] = {
-            dotnet_analyzer_diagnostics_scope = "openFiles",
-            dotnet_compiler_diagnostics_scope = "openFiles",
-          },
-          ["csharp|inlay_hints"] = {
-            dotnet_enable_inlay_hints_for_parameters = true,
-            dotnet_enable_inlay_hints_for_literal_parameters = false,
-            dotnet_enable_inlay_hints_for_indexer_parameters = false,
-            dotnet_enable_inlay_hints_for_object_creation_parameters = false,
-            dotnet_enable_inlay_hints_for_other_parameters = true,
-            dotnet_suppress_inlay_hints_for_parameters_that_differ_only_by_suffix = true,
-            dotnet_suppress_inlay_hints_for_parameters_that_match_method_intent = true,
-            dotnet_suppress_inlay_hints_for_parameters_that_match_argument_name = true,
-          },
-          ["csharp|completion"] = {
-            dotnet_provide_regex_completions = true,
-            dotnet_show_completion_items_from_unimported_namespaces = true,
-            dotnet_show_name_completion_suggestions = true,
-          },
-          ["csharp|code_lens"] = {
-            dotnet_enable_references_code_lens = false,
-            dotnet_enable_tests_code_lens = false,
-          },
-        },
-        on_attach = function(_, bufnr)
-          local opts = { buffer = bufnr, noremap = true, silent = true }
-          vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
-          vim.keymap.set("n", "<leader>co", function()
-            vim.lsp.buf.code_action({
-              apply = true,
-              context = { only = { "source.organizeImports" }, diagnostics = {} },
-            })
-          end, vim.tbl_extend("force", opts, { desc = "Organize Imports (C#)" }))
-        end,
-      },
     })
   end,
 }

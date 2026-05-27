@@ -14,79 +14,117 @@ TMP_EXTRACT="/tmp/jdtls-extract"
 
 trap 'rm -f "$TMP_TARBALL" "$TMP_LOMBOK"; rm -rf "$TMP_EXTRACT"' EXIT
 
+## HELPERS
+
+_pick_version() {
+  local prompt="$1" versions="$2" installed="$3"
+  local -a arr
+  mapfile -t arr <<< "$versions"
+
+  echo "" >&2
+  local i=1
+  for v in "${arr[@]}"; do
+    [[ $i -eq 1 ]] \
+      && printf "  %2d) %s  [latest]\n" "$i" "$v" >&2 \
+      || printf "  %2d) %s\n" "$i" "$v" >&2
+    ((i++))
+  done
+  [[ -n "$installed" ]] && printf "\n  installed: %s\n" "$installed" >&2
+  echo "" >&2
+
+  local input
+  read -rp "$prompt [number / version / Enter for latest]: " input </dev/tty
+
+  if [[ -z "$input" ]]; then
+    echo "${arr[0]}"
+  elif [[ "$input" =~ ^[0-9]+$ ]]; then
+    echo "${arr[$(( input - 1 ))]}"
+  else
+    echo "$input"
+  fi
+}
+
+## READ CURRENT VERSIONS (shown in picker header)
+
+CURRENT_JDTLS=""
+[[ -f "$VERSION_FILE_JDTLS" ]] && CURRENT_JDTLS=$(cat "$VERSION_FILE_JDTLS")
+
+CURRENT_LOMBOK=""
+[[ -f "$VERSION_FILE_LOMBOK" ]] && CURRENT_LOMBOK=$(cat "$VERSION_FILE_LOMBOK")
+
 ## JDTLS
 
-echo "Fetching latest jdtls version..."
-JDTLS_TAG=$(curl -fsSL "https://api.github.com/repos/${JDTLS_REPO}/tags?per_page=1" | jq -r '.[0].name')
-JDTLS_VERSION="${JDTLS_TAG#v}"
+echo "Fetching jdtls versions..."
+JDTLS_TAGS=$(curl -fsSL "https://api.github.com/repos/${JDTLS_REPO}/tags?per_page=10" \
+  | jq -r '.[].name')
 
-if [[ -z "$JDTLS_TAG" || "$JDTLS_TAG" == "null" ]]; then
-  echo "error: could not parse jdtls version from GitHub API response" >&2
+if [[ -z "$JDTLS_TAGS" ]]; then
+  echo "error: could not fetch jdtls versions from GitHub API" >&2
   exit 1
 fi
 
-echo "Latest jdtls: $JDTLS_TAG"
+JDTLS_TAG=$(_pick_version "Select jdtls version" "$JDTLS_TAGS" "$CURRENT_JDTLS")
+JDTLS_VERSION="${JDTLS_TAG#v}"
 
-if [[ -f "$VERSION_FILE_JDTLS" ]] && [[ "$(cat "$VERSION_FILE_JDTLS")" == "$JDTLS_TAG" ]]; then
-  echo "jdtls $JDTLS_TAG already installed, skipping"
-else
-  JDTLS_TARBALL=$(curl -fsSL "${JDTLS_MIRROR}/${JDTLS_VERSION}/" \
-    | grep -oE "jdt-language-server-${JDTLS_VERSION}-[0-9]+\.tar\.gz" \
-    | head -1)
+echo "Selected jdtls: $JDTLS_TAG"
 
-  if [[ -z "$JDTLS_TARBALL" ]]; then
-    echo "error: could not find jdtls tarball for version ${JDTLS_VERSION}" >&2
-    exit 1
-  fi
+JDTLS_TARBALL=$(curl -fsSL "${JDTLS_MIRROR}/${JDTLS_VERSION}/" \
+  | grep -oE "jdt-language-server-${JDTLS_VERSION}-[0-9]+\.tar\.gz" \
+  | head -1)
 
-  echo "Downloading jdtls $JDTLS_TAG..."
-  curl -fL --progress-bar "${JDTLS_MIRROR}/${JDTLS_VERSION}/${JDTLS_TARBALL}" -o "$TMP_TARBALL"
-
-  echo "Extracting..."
-  rm -rf "$TMP_EXTRACT"
-  mkdir -p "$TMP_EXTRACT"
-  tar -xzf "$TMP_TARBALL" -C "$TMP_EXTRACT"
-
-  if ls "$INSTALL_DIR/plugins/lombok"*.jar &>/dev/null; then
-    echo "Preserving existing lombok jar..."
-    cp "$INSTALL_DIR/plugins/lombok"*.jar "$TMP_EXTRACT/plugins/"
-  fi
-
-  echo "Installing to $INSTALL_DIR..."
-  rm -rf "$INSTALL_DIR"
-  mv "$TMP_EXTRACT" "$INSTALL_DIR"
-
-  printf '%s' "$JDTLS_TAG" > "$VERSION_FILE_JDTLS"
-  echo "jdtls $JDTLS_TAG installed"
+if [[ -z "$JDTLS_TARBALL" ]]; then
+  echo "error: could not find jdtls tarball for version ${JDTLS_VERSION}" >&2
+  exit 1
 fi
+
+echo "Downloading jdtls $JDTLS_TAG..."
+curl -fL --progress-bar "${JDTLS_MIRROR}/${JDTLS_VERSION}/${JDTLS_TARBALL}" -o "$TMP_TARBALL"
+
+echo "Extracting..."
+rm -rf "$TMP_EXTRACT"
+mkdir -p "$TMP_EXTRACT"
+tar -xzf "$TMP_TARBALL" -C "$TMP_EXTRACT"
+
+if ls "$INSTALL_DIR/plugins/lombok"*.jar &>/dev/null 2>&1; then
+  echo "Preserving existing lombok jar..."
+  cp "$INSTALL_DIR/plugins/lombok"*.jar "$TMP_EXTRACT/plugins/"
+fi
+
+echo "Installing to $INSTALL_DIR..."
+rm -rf "$INSTALL_DIR"
+mv "$TMP_EXTRACT" "$INSTALL_DIR"
+
+printf '%s' "$JDTLS_TAG" > "$VERSION_FILE_JDTLS"
+echo "jdtls $JDTLS_TAG installed"
 
 ## LOMBOK
 
-echo "Fetching latest lombok version..."
-LOMBOK_VERSION=$(curl -fsSL "${LOMBOK_MAVEN}/maven-metadata.xml" \
-  | sed -n 's/.*<release>\(.*\)<\/release>.*/\1/p')
+echo "Fetching lombok versions..."
+LOMBOK_VERSIONS=$(curl -fsSL "${LOMBOK_MAVEN}/maven-metadata.xml" \
+  | sed -n 's/.*<version>\(.*\)<\/version>.*/\1/p' \
+  | grep -v SNAPSHOT \
+  | sort -rV \
+  | head -20)
 
-if [[ -z "$LOMBOK_VERSION" ]]; then
-  echo "error: could not parse lombok version from Maven Central" >&2
+if [[ -z "$LOMBOK_VERSIONS" ]]; then
+  echo "error: could not fetch lombok versions from Maven Central" >&2
   exit 1
 fi
 
-echo "Latest lombok: $LOMBOK_VERSION"
+LOMBOK_VERSION=$(_pick_version "Select lombok version" "$LOMBOK_VERSIONS" "$CURRENT_LOMBOK")
 
-if [[ -f "$VERSION_FILE_LOMBOK" ]] && [[ "$(cat "$VERSION_FILE_LOMBOK")" == "$LOMBOK_VERSION" ]]; then
-  echo "lombok $LOMBOK_VERSION already installed, skipping"
-else
-  mkdir -p "$INSTALL_DIR/plugins"
-  rm -f "$INSTALL_DIR/plugins/lombok"*.jar
+echo "Selected lombok: $LOMBOK_VERSION"
 
-  echo "Downloading lombok $LOMBOK_VERSION..."
-  curl -fL --progress-bar "${LOMBOK_MAVEN}/${LOMBOK_VERSION}/lombok-${LOMBOK_VERSION}.jar" -o "$TMP_LOMBOK"
+mkdir -p "$INSTALL_DIR/plugins"
+rm -f "$INSTALL_DIR/plugins/lombok"*.jar
 
-  cp "$TMP_LOMBOK" "$INSTALL_DIR/plugins/lombok-${LOMBOK_VERSION}.jar"
+echo "Downloading lombok $LOMBOK_VERSION..."
+curl -fL --progress-bar "${LOMBOK_MAVEN}/${LOMBOK_VERSION}/lombok-${LOMBOK_VERSION}.jar" -o "$TMP_LOMBOK"
 
-  printf '%s' "$LOMBOK_VERSION" > "$VERSION_FILE_LOMBOK"
-  echo "lombok $LOMBOK_VERSION installed"
-fi
+cp "$TMP_LOMBOK" "$INSTALL_DIR/plugins/lombok-${LOMBOK_VERSION}.jar"
+
+printf '%s' "$LOMBOK_VERSION" > "$VERSION_FILE_LOMBOK"
+echo "lombok $LOMBOK_VERSION installed"
 
 ## VERIFY
 

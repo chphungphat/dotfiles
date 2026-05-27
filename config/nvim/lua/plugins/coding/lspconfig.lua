@@ -266,6 +266,17 @@ return {
     vim.lsp.enable("taplo")
     vim.lsp.config("taplo", {})
 
+    vim.lsp.enable("tailwindcss")
+    vim.lsp.config("tailwindcss", {
+      settings = {
+        tailwindCSS = {
+          experimental = {
+            configFile = "src/themes/global.css",
+          },
+        },
+      },
+    })
+
     vim.lsp.enable("gitlab_ci_ls")
     vim.lsp.config("gitlab_ci_ls", {})
 
