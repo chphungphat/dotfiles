@@ -92,13 +92,6 @@ return {
           })
         end, vim.tbl_extend("force", opts, { desc = "Next Warning/Info/Hint" }))
 
-        vim.keymap.set(
-          "n",
-          "<leader>cd",
-          vim.diagnostic.open_float,
-          vim.tbl_extend("force", opts, { desc = "Show diagnostic" })
-        )
-
         local client = vim.lsp.get_client_by_id(event.data.client_id)
         if client and client.name == "ts_ls" then
           vim.keymap.set("n", "<leader>oi", function()

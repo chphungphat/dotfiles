@@ -190,18 +190,26 @@ return {
           vim.defer_fn(function() vim.cmd("edit") end, 500)
         end, { desc = "Wipe jdtls workspace and restart" })
 
-        vim.keymap.set("n", "<leader>jo", "<Cmd>lua require('jdtls').organize_imports()<CR>", opts)
-        vim.keymap.set("n", "<leader>jv", "<Cmd>lua require('jdtls').extract_variable()<CR>", opts)
-        vim.keymap.set("v", "<leader>jv", "<Esc><Cmd>lua require('jdtls').extract_variable(true)<CR>", opts)
-        vim.keymap.set("n", "<leader>jc", "<Cmd>lua require('jdtls').extract_constant()<CR>", opts)
-        vim.keymap.set("v", "<leader>jc", "<Esc><Cmd>lua require('jdtls').extract_constant(true)<CR>", opts)
-        vim.keymap.set("v", "<leader>jm", "<Esc><Cmd>lua require('jdtls').extract_method(true)<CR>", opts)
+        vim.keymap.set("n", "<leader>jo", "<Cmd>lua require('jdtls').organize_imports()<CR>",
+          vim.tbl_extend("force", opts, { desc = "Organize imports" }))
+        vim.keymap.set("n", "<leader>jv", "<Cmd>lua require('jdtls').extract_variable()<CR>",
+          vim.tbl_extend("force", opts, { desc = "Extract variable" }))
+        vim.keymap.set("v", "<leader>jv", "<Esc><Cmd>lua require('jdtls').extract_variable(true)<CR>",
+          vim.tbl_extend("force", opts, { desc = "Extract variable" }))
+        vim.keymap.set("n", "<leader>jc", "<Cmd>lua require('jdtls').extract_constant()<CR>",
+          vim.tbl_extend("force", opts, { desc = "Extract constant" }))
+        vim.keymap.set("v", "<leader>jc", "<Esc><Cmd>lua require('jdtls').extract_constant(true)<CR>",
+          vim.tbl_extend("force", opts, { desc = "Extract constant" }))
+        vim.keymap.set("v", "<leader>jm", "<Esc><Cmd>lua require('jdtls').extract_method(true)<CR>",
+          vim.tbl_extend("force", opts, { desc = "Extract method" }))
         vim.keymap.set(
           "n", "<leader>ju", "<Cmd>JdtWipeWorkspace<CR>",
           vim.tbl_extend("force", opts, { desc = "Wipe workspace and restart" })
         )
-        vim.keymap.set("n", "<leader>jt", "<Cmd>lua require('jdtls').test_class()<CR>", opts)
-        vim.keymap.set("n", "<leader>jn", "<Cmd>lua require('jdtls').test_nearest_method()<CR>", opts)
+        vim.keymap.set("n", "<leader>jt", "<Cmd>lua require('jdtls').test_class()<CR>",
+          vim.tbl_extend("force", opts, { desc = "Test class" }))
+        vim.keymap.set("n", "<leader>jn", "<Cmd>lua require('jdtls').test_nearest_method()<CR>",
+          vim.tbl_extend("force", opts, { desc = "Test nearest method" }))
         vim.keymap.set(
           "n", "<leader>js", "<Cmd>lua require('jdtls').super_implementation()<CR>",
           vim.tbl_extend("force", opts, { desc = "Go to super implementation" })

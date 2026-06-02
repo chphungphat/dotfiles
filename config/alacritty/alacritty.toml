@@ -14,19 +14,19 @@ offset = { x = 0, y = 1 }
 builtin_box_drawing = true
 
 [font.normal]
-family = "Hack Nerd Font Mono"
+family = "JetBrainsMono NFM"
 style = "Regular"
 
 [font.bold]
-family = "Hack Nerd Font Mono"
+family = "JetBrainsMono NFM"
 style = "Bold"
 
 [font.italic]
-family = "Hack Nerd Font Mono"
+family = "JetBrainsMono NFM"
 style = "Italic"
 
 [font.bold_italic]
-family = "Hack Nerd Font Mono"
+family = "JetBrainsMono NFM"
 style = "Bold Italic"
 
 [cursor]

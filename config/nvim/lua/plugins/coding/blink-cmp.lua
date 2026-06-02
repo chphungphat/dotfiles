@@ -20,7 +20,7 @@ return {
     },
 
     sources = {
-      default = { "lsp", "path", "buffer", "lazydev" },
+      default = { "lsp", "path", "snippets", "buffer", "lazydev" },
 
       providers = {
         lazydev = {
@@ -75,7 +75,7 @@ return {
     },
 
     fuzzy = {
-      implementation = "rust",
+      implementation = "prefer_rust_with_warning",
       sorts = { "exact", "score", "sort_text" },
     },
   },
