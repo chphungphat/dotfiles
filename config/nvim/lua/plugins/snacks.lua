@@ -18,7 +18,10 @@ return {
     },
     quickfile = { enabled = true },
     statuscolumn = { enabled = true },
-    indent = { enabled = true },
+    indent = {
+      enabled = true,
+      scope = { underline = true },
+    },
     words = { enabled = true },
     input = { enabled = true },
     rename = { enabled = true },

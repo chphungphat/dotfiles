@@ -1,4 +1,8 @@
-return {
+-- Kept as reference for color overrides.
+-- To restore: delete lines 1-3, then uncomment the block below.
+return {}
+
+--[[ return {
   "catppuccin/nvim",
   name = "catppuccin",
   priority = 1000,
@@ -217,4 +221,4 @@ return {
       end, { desc = t.name .. " theme" })
     end
   end,
-}
+} ]]
