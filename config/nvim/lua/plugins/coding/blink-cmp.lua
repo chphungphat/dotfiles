@@ -3,6 +3,8 @@ return {
   dependencies = {
     "folke/lazydev.nvim",
     "echasnovski/mini.icons",
+    "rafamadriz/friendly-snippets",
+    "fang2hou/blink-copilot",
   },
   version = "1.*",
   build = "cargo build --release",
@@ -20,13 +22,18 @@ return {
     },
 
     sources = {
-      default = { "lsp", "path", "snippets", "buffer", "lazydev" },
+      default = { "lsp", "path", "snippets", "buffer", "lazydev", "copilot" },
 
       providers = {
         lazydev = {
           name = "LazyDev",
           module = "lazydev.integrations.blink",
           score_offset = 100,
+        },
+        copilot = {
+          name = "copilot",
+          module = "blink-copilot",
+          async = true,
         },
       },
     },
