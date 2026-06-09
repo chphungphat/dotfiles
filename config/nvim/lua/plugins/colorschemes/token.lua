@@ -1,3 +1,4 @@
+-- return {}
 return {
   "ThorstenRhau/token",
   priority = 1000,

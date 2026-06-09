@@ -15,6 +15,7 @@ return {
       { "<leader>l", group = "log" },
       { "<leader>j", group = "java" },
       { "<leader>h", group = "help" },
+      { "<leader>n", group = "neogen" },
       { "<leader>f", group = "format" },
 
       -- ] / [ navigation groups (individual bindings already have desc)

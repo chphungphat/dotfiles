@@ -17,17 +17,17 @@ return {
       formatters_by_ft = {
         lua = { "stylua" },
 
-        javascript = { "prettier" },
-        typescript = { "prettier" },
-        javascriptreact = { "prettier" },
-        typescriptreact = { "prettier" },
-        json = { "prettier" },
-        jsonc = { "prettier" },
-        html = { "prettier" },
-        css = { "prettier" },
-        scss = { "prettier" },
-        yaml = { "prettier" },
-        markdown = { "prettier" },
+        javascript = { "prettierd" },
+        typescript = { "prettierd" },
+        javascriptreact = { "prettierd" },
+        typescriptreact = { "prettierd" },
+        json = { "prettierd" },
+        jsonc = { "prettierd" },
+        html = { "prettierd" },
+        css = { "prettierd" },
+        scss = { "prettierd" },
+        yaml = { "prettierd" },
+        markdown = { "prettierd" },
 
         -- Python
         python = { "isort", "black" },
@@ -89,8 +89,8 @@ return {
       end,
 
       formatters = {
-        prettier = {
-          command = "prettier",
+        prettierd = {
+          command = "prettierd",
           condition = function(_, ctx)
             local prettier_files = {
               ".prettierrc",

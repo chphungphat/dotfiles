@@ -95,10 +95,13 @@ return {
         local client = vim.lsp.get_client_by_id(event.data.client_id)
         if client and client.name == "ts_ls" then
           vim.keymap.set("n", "<leader>oi", function()
-            vim.lsp.buf.execute_command({
-              command = "_typescript.organizeImports",
-              arguments = { vim.api.nvim_buf_get_name(0) },
-            })
+            local tsClient = vim.lsp.get_clients({ name = "ts_ls", bufnr = 0 })[1]
+            if tsClient then
+              tsClient:request("workspace/executeCommand", {
+                command = "_typescript.organizeImports",
+                arguments = { vim.api.nvim_buf_get_name(0) },
+              })
+            end
           end, vim.tbl_extend("force", opts, { desc = "Organize imports" }))
         end
 
