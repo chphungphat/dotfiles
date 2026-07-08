@@ -22,8 +22,17 @@ return {
     },
 
     sources = {
-      default = { "lsp", "path", "snippets", "buffer", "lazydev",
-        -- "copilot"
+      default = { "lsp", "path", "snippets", "buffer", "lazydev" },
+
+      min_keyword_length = 1,
+
+      per_filetype = {
+        typescript = { "lsp", "path", "snippets" },
+        typescriptreact = { "lsp", "path", "snippets" },
+        javascript = { "lsp", "path", "snippets" },
+        javascriptreact = { "lsp", "path", "snippets" },
+        ["typescript.tsx"] = { "lsp", "path", "snippets" },
+        ["javascript.jsx"] = { "lsp", "path", "snippets" },
       },
 
       providers = {
@@ -31,6 +40,13 @@ return {
           name = "LazyDev",
           module = "lazydev.integrations.blink",
           score_offset = 100,
+        },
+        buffer = {
+          score_offset = -5,
+          opts = {
+            max_sync_buffer_size = 10000,
+            max_async_buffer_size = 80000,
+          },
         },
         -- copilot = {
         --   name = "copilot",
