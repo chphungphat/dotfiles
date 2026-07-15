@@ -136,19 +136,19 @@ return {
     })
 
     -- Styles
-    vim.lsp.enable("tailwindcss")
-    vim.lsp.config("tailwindcss", {
-      filetypes = {
-        "html", "css", "scss",
-        "javascript", "javascriptreact", "typescript", "typescriptreact",
-        "vue", "svelte", "astro",
-      },
-      settings = {
-        tailwindCSS = {
-          experimental = { configFile = "src/themes/global.css" },
-        },
-      },
-    })
+    -- vim.lsp.enable("tailwindcss")
+    -- vim.lsp.config("tailwindcss", {
+    --   filetypes = {
+    --     "html", "css", "scss",
+    --     "javascript", "javascriptreact", "typescript", "typescriptreact",
+    --     "vue", "svelte", "astro",
+    --   },
+    --   settings = {
+    --     tailwindCSS = {
+    --       experimental = { configFile = "src/themes/global.css" },
+    --     },
+    --   },
+    -- })
 
     -- HTML / CSS
     vim.lsp.enable("html")

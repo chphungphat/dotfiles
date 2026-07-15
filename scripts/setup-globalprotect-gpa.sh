@@ -20,6 +20,14 @@ echo "Installing gpa.service to $USER_SYSTEMD_DIR..."
 mkdir -p "$USER_SYSTEMD_DIR"
 cp "$GPA_SERVICE_SRC" "$GPA_SERVICE_DEST"
 
+# Fix PanGPA exiting with code 0 on boot before GUI is ready
+echo "Creating systemd override to ensure PanGPA restarts if GUI is not ready..."
+mkdir -p "$USER_SYSTEMD_DIR/gpa.service.d"
+cat > "$USER_SYSTEMD_DIR/gpa.service.d/override.conf" << 'EOF'
+[Service]
+Restart=always
+RestartSec=2
+EOF
 ## ENABLE AND START
 
 echo "Reloading systemd user daemon..."
