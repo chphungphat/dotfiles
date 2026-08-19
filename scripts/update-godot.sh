@@ -50,3 +50,26 @@ echo "Downloading desktop file and icon..."
 curl -fsSL -o org.godotengine.Godot.desktop "https://raw.githubusercontent.com/godotengine/godot/master/misc/dist/linux/org.godotengine.Godot.desktop"
 curl -fsSL -o godot.svg "https://raw.githubusercontent.com/godotengine/godot/master/misc/logo/icon.svg" || curl -fsSL -o godot.svg "https://raw.githubusercontent.com/godotengine/godot/master/misc/dist/linux/godot.svg"
 
+echo "Creating symlinks..."
+
+BIN_DIR="$HOME/.local/bin"
+mkdir -p "$BIN_DIR"
+ln -sf "$GODOT_DIR/godot" "$BIN_DIR/godot"
+
+APP_DIR="$HOME/.local/share/applications"
+mkdir -p "$APP_DIR"
+ln -sf "$GODOT_DIR/org.godotengine.Godot.desktop" "$APP_DIR/org.godotengine.Godot.desktop"
+
+ICON_DIR="$HOME/.local/share/icons/hicolor/scalable/apps"
+mkdir -p "$ICON_DIR"
+ln -sf "$GODOT_DIR/godot.svg" "$ICON_DIR/godot.svg"
+
+if command -v update-desktop-database &>/dev/null; then
+  update-desktop-database "$APP_DIR"
+fi
+
+if command -v gtk-update-icon-cache &>/dev/null; then
+  gtk-update-icon-cache -f -t "$HOME/.local/share/icons/hicolor"
+fi
+
+echo "DONE. Godot $LATEST_VERSION installed."
