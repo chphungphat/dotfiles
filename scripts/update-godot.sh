@@ -31,3 +31,22 @@ if [[ -x "$GODOT_DIR/godot" && -n "$CURRENT_VERSION" ]]; then
   mkdir -p "$ARCHIVE_DIR"
   mv "$GODOT_DIR/godot" "$ARCHIVE_DIR/"
 fi
+
+echo "Downloading Godot $LATEST_VERSION..."
+ZIP_NAME="Godot_v${LATEST_VERSION}_linux.x86_64.zip"
+DOWNLOAD_URL="https://github.com/godotengine/godot/releases/latest/download/$ZIP_NAME"
+
+mkdir -p "$GODOT_DIR"
+cd "$GODOT_DIR"
+curl -L -o "$ZIP_NAME" "$DOWNLOAD_URL"
+
+echo "Extracting binary..."
+unzip -q -o "$ZIP_NAME"
+mv "Godot_v${LATEST_VERSION}_linux.x86_64" "godot"
+chmod +x "godot"
+rm -f "$ZIP_NAME"
+
+echo "Downloading desktop file and icon..."
+curl -s -L -o org.godotengine.Godot.desktop "https://raw.githubusercontent.com/godotengine/godot/master/misc/dist/linux/org.godotengine.Godot.desktop"
+curl -s -L -o godot.svg "https://raw.githubusercontent.com/godotengine/godot/master/misc/logo/icon.svg" || curl -s -L -o godot.svg "https://raw.githubusercontent.com/godotengine/godot/master/misc/dist/linux/godot.svg"
+
