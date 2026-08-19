@@ -13,17 +13,19 @@ echo "Latest version: $LATEST_VERSION"
 
 CURRENT_VERSION=""
 if [[ -x "$GODOT_DIR/godot" ]]; then
-  # godot --version outputs something like "4.7.1.stable.official.a13da4feb"
-  CURRENT_VERSION=$("$GODOT_DIR/godot" --version 2>/dev/null | awk -F'.' '{print $1"."$2"."$3"-"$4}')
-  echo "Current version: $CURRENT_VERSION"
+  # godot --version outputs something like "4.7.1.stable.official.a13da4feb" or "4.3.stable.official.77dcf97d0"
+  CURRENT_VERSION=$("$GODOT_DIR/godot" --version 2>/dev/null | awk -F'.stable' 'NF>1 {print $1"-stable"}' || true)
+  if [[ -n "$CURRENT_VERSION" ]]; then
+    echo "Current version: $CURRENT_VERSION"
+  fi
 fi
 
-if [[ "$CURRENT_VERSION" == "$LATEST_VERSION" ]]; then
+if [[ -n "$CURRENT_VERSION" && "$CURRENT_VERSION" == "$LATEST_VERSION" ]]; then
   echo "Already on latest version: $LATEST_VERSION. Exiting"
   exit 0
 fi
 
-if [[ -x "$GODOT_DIR/godot" ]]; then
+if [[ -x "$GODOT_DIR/godot" && -n "$CURRENT_VERSION" ]]; then
   ARCHIVE_DIR="$GODOT_DIR/$CURRENT_VERSION"
   echo "Archiving current version to $ARCHIVE_DIR..."
   mkdir -p "$ARCHIVE_DIR"
