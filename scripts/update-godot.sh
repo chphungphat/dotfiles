@@ -38,7 +38,7 @@ DOWNLOAD_URL="https://github.com/godotengine/godot/releases/latest/download/$ZIP
 
 mkdir -p "$GODOT_DIR"
 cd "$GODOT_DIR"
-curl -L -o "$ZIP_NAME" "$DOWNLOAD_URL"
+curl -fsSL -o "$ZIP_NAME" "$DOWNLOAD_URL"
 
 echo "Extracting binary..."
 unzip -q -o "$ZIP_NAME"
@@ -47,6 +47,6 @@ chmod +x "godot"
 rm -f "$ZIP_NAME"
 
 echo "Downloading desktop file and icon..."
-curl -s -L -o org.godotengine.Godot.desktop "https://raw.githubusercontent.com/godotengine/godot/master/misc/dist/linux/org.godotengine.Godot.desktop"
-curl -s -L -o godot.svg "https://raw.githubusercontent.com/godotengine/godot/master/misc/logo/icon.svg" || curl -s -L -o godot.svg "https://raw.githubusercontent.com/godotengine/godot/master/misc/dist/linux/godot.svg"
+curl -fsSL -o org.godotengine.Godot.desktop "https://raw.githubusercontent.com/godotengine/godot/master/misc/dist/linux/org.godotengine.Godot.desktop"
+curl -fsSL -o godot.svg "https://raw.githubusercontent.com/godotengine/godot/master/misc/logo/icon.svg" || curl -fsSL -o godot.svg "https://raw.githubusercontent.com/godotengine/godot/master/misc/dist/linux/godot.svg"
 
