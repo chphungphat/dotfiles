@@ -1,0 +1,12 @@
+return {}
+-- return {
+--   "uhs-robert/oasis.nvim",
+--   priority = 1000,
+--   lazy = false,
+--   config = function()
+--     require("oasis").setup({
+--       style = "abyss",
+--     })
+--     vim.cmd.colorscheme("oasis")
+--   end,
+-- }
