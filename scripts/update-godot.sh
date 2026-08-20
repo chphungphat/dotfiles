@@ -57,6 +57,10 @@ echo "Downloading desktop file and icon..."
 curl -fsSL -o "$GODOT_DIR/org.godotengine.Godot.desktop" "https://raw.githubusercontent.com/godotengine/godot/${LATEST_TAG}/misc/dist/linux/org.godotengine.Godot.desktop"
 curl -fsSL -o "$GODOT_DIR/godot.svg" "https://raw.githubusercontent.com/godotengine/godot/${LATEST_TAG}/misc/logo/icon.svg" || curl -fsSL -o "$GODOT_DIR/godot.svg" "https://raw.githubusercontent.com/godotengine/godot/${LATEST_TAG}/misc/dist/linux/godot.svg" || curl -fsSL -o "$GODOT_DIR/godot.svg" "https://raw.githubusercontent.com/godotengine/godot/${LATEST_TAG}/icon.svg"
 
+echo "Patching desktop file paths..."
+sed -i "s|Exec=godot %f|Exec=$HOME/.local/bin/godot %f|" "$GODOT_DIR/org.godotengine.Godot.desktop"
+sed -i "s|Icon=godot|Icon=$HOME/.local/share/icons/hicolor/scalable/apps/godot.svg|" "$GODOT_DIR/org.godotengine.Godot.desktop"
+
 echo "Creating symlinks..."
 
 BIN_DIR="$HOME/.local/bin"
