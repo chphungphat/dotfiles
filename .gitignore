@@ -22,3 +22,5 @@ CLAUDE.md
 .serena
 
 docs/superpowers
+
+docker/hindsight/.env

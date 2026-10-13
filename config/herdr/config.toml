@@ -1,0 +1,56 @@
+onboarding = false
+
+[theme]
+name = "gruvbox"
+auto_switch = false
+
+[terminal]
+default_shell = "/usr/bin/zsh"
+
+[ui]
+status_indicators = "symbols"
+accent = "#fe8019"
+pane_outer_borders = false
+pane_gaps = false
+
+[ui.toast]
+delivery = "off"
+
+[keys]
+# Prefix key: matches tmux `set-option -g prefix M-a`
+prefix = "alt+a"
+
+# --- Splits ---
+# Matches tmux `bind s split-window -h` (side-by-side split)
+split_vertical = "prefix+s"
+# Matches tmux `bind v split-window -v` (stacked split)
+split_horizontal = "prefix+v"
+
+# --- Pane Navigation & Management ---
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+zoom = ["prefix+m", "prefix+z"]
+close_pane = "prefix+x"
+
+# --- Tab (Window) Management ---
+new_tab = "prefix+c"
+switch_tab = ["alt+1..9", "prefix+1..9"]
+move_tab_previous = "shift+left"
+move_tab_next = "shift+right"
+rename_tab = "prefix+r"
+close_tab = "prefix+shift+x"
+
+# --- Session (Workspace) Management ---
+rename_workspace = "prefix+shift+r"
+close_workspace = "prefix+shift+k"
+workspace_picker = ["prefix+o", "prefix+w"]
+detach = ["prefix+d", "prefix+q"]
+
+# --- Utility & Herdr Actions (Conflict Resolutions) ---
+reload_config = "prefix+shift+p"
+settings = "prefix+,"
+resize_mode = "prefix+shift+m"
+open_notification_target = "prefix+shift+o"
+copy_mode = "prefix+["

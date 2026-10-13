@@ -1,0 +1,104 @@
+# Hindsight (https://hindsight.vectorize.io) — self-hosted agent memory server.
+# db: Postgres 18 + pgvector. hindsight: API (:8888) + Control Plane UI (:9999).
+#
+# Usage: cp .env.example .env (fill in secrets), docker compose up -d. Auto-starts
+# on boot via systemd --user units, see ../../scripts/setup-hindsight.sh.
+#
+# Logging: json-file driver on both services; setup-hindsight.sh also installs
+# hindsight-logs-{db,app}.service to mirror `docker logs -f` into
+# docker/hindsight/logs/{db,app}.log (root-only otherwise).
+
+services:
+  # Image tag = "pg<postgres-major-version>". Bumping HINDSIGHT_DB_VERSION points
+  # at a fresh data subfolder — real upgrades still need pg_dumpall + restore.
+  db:
+    image: pgvector/pgvector:pg${HINDSIGHT_DB_VERSION:-18}
+    container_name: hindsight-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${HINDSIGHT_DB_USER:-hindsight_user}
+      POSTGRES_PASSWORD: ${HINDSIGHT_DB_PASSWORD:?Please set HINDSIGHT_DB_PASSWORD in .env}
+      POSTGRES_DB: ${HINDSIGHT_DB_NAME:-hindsight_db}
+    volumes:
+      - pg_data:/var/lib/postgresql/${HINDSIGHT_DB_VERSION:-18}/docker
+    ports:
+      # Loopback-only: lets the host-networked hindsight service reach Postgres
+      # via 127.0.0.1, same as it reaches host-bound CliProxyAPI.
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${HINDSIGHT_DB_USER:-hindsight_user} -d ${HINDSIGHT_DB_NAME:-hindsight_db}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - hindsight-net
+
+  hindsight:
+    image: ghcr.io/vectorize-io/hindsight:${HINDSIGHT_VERSION:-latest}
+    container_name: hindsight-app
+    restart: unless-stopped
+    # Host network, not the hindsight-net bridge: CliProxyAPI binds only to
+    # 127.0.0.1 on host; HINDSIGHT_API_HOST below keeps hindsight loopback-only too.
+    network_mode: host
+    environment:
+      HINDSIGHT_API_HOST: 127.0.0.1
+      # --- Database (external Postgres, not embedded pg0) ---
+      HINDSIGHT_API_DATABASE_URL: postgresql://${HINDSIGHT_DB_USER:-hindsight_user}:${HINDSIGHT_DB_PASSWORD:?Please set HINDSIGHT_DB_PASSWORD in .env}@127.0.0.1:5432/${HINDSIGHT_DB_NAME:-hindsight_db}
+      HINDSIGHT_API_WORKER_ID: hindsight-local
+      # --- LLM provider: CliProxyAPI, OpenAI-compatible gateway to
+      # Antigravity/Gemini, Claude Code, Codex, Grok Build ---
+      HINDSIGHT_API_LLM_PROVIDER: openai
+      HINDSIGHT_API_LLM_API_KEY: ${CLIPROXY_API_KEY:?Please set CLIPROXY_API_KEY in .env}
+      HINDSIGHT_API_LLM_BASE_URL: ${CLIPROXY_BASE_URL:-http://127.0.0.1:9988/v1}
+      HINDSIGHT_API_LLM_MODEL: ${HINDSIGHT_API_LLM_MODEL:-gemini-3.7-flash-high}
+      # One antigravity OAuth account backs every gemini-* model, so a same-provider
+      # "failover" adds no redundancy; this caps parallel calls instead. Default 32.
+      HINDSIGHT_API_LLM_MAX_CONCURRENT: ${HINDSIGHT_API_LLM_MAX_CONCURRENT:-8}
+      # Hindsight's native "gemini" provider ignores HINDSIGHT_API_LLM_BASE_URL
+      # (hardcoded to Google's API) — "openai" above is the only CliProxyAPI route.
+      # --- API auth: require a bearer token on every request ---
+      HINDSIGHT_API_TENANT_EXTENSION: hindsight_api.extensions.builtin.tenant:ApiKeyTenantExtension
+      HINDSIGHT_API_TENANT_API_KEY: ${HINDSIGHT_API_TENANT_API_KEY:?Please set HINDSIGHT_API_TENANT_API_KEY in .env}
+      # --- Control Plane (Web UI) auth ---
+      HINDSIGHT_CP_ACCESS_KEY: ${HINDSIGHT_CP_ACCESS_KEY:?Please set HINDSIGHT_CP_ACCESS_KEY in .env}
+      HINDSIGHT_CP_DATAPLANE_API_KEY: ${HINDSIGHT_API_TENANT_API_KEY:?Please set HINDSIGHT_API_TENANT_API_KEY in .env}
+      # --- Structured logging ---
+      HINDSIGHT_API_LOG_FORMAT: json
+      HINDSIGHT_API_LOG_LEVEL: info
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python3",
+          "-c",
+          "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8888/health/live', timeout=3).status == 200 else 1)",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+networks:
+  hindsight-net:
+    driver: bridge
+
+volumes:
+  pg_data:

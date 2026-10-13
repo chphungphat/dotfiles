@@ -37,10 +37,10 @@ return {
         bash = { "shfmt" },
 
         -- C/C++
-        c = { "clang_format" },
-        cpp = { "clang_format" },
-        objc = { "clang_format" },
-        objcpp = { "clang_format" },
+        c = { "clang-format" },
+        cpp = { "clang-format" },
+        objc = { "clang-format" },
+        objcpp = { "clang-format" },
 
         -- C#
         cs = { "csharpier" },
@@ -74,7 +74,7 @@ return {
 
         -- Skip for certain paths
         local bufname = vim.api.nvim_buf_get_name(bufnr)
-        local ignore_patterns = { "node_modules", "%.git/", "vendor/", "target/", "build/" }
+        local ignore_patterns = { "/node_modules/", "/%.git/", "/vendor/", "/target/", "/build/" }
         for _, pattern in ipairs(ignore_patterns) do
           if bufname:match(pattern) then
             return
@@ -157,7 +157,7 @@ return {
           prepend_args = { "-i", "2", "-ci" },
         },
 
-        clang_format = {
+        ["clang-format"] = {
           condition = function(_, ctx)
             local cwd = vim.fs.dirname(ctx.filename)
             return vim.uv.fs_stat(cwd .. "/.clang-format") ~= nil

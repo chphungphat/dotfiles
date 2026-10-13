@@ -8,6 +8,11 @@ return {
   lazy = false,
   config = function()
     require('token').setup({
+      dim_inactive = true,
+      plugins = {
+        all = true
+      },
+
       on_highlights = function(highlights, colors)
         highlights.GitSignsCurrentLineBlame = { fg = colors.fg2, italic = true }
         highlights.SnacksPickerDir = { fg = colors.fg2 }
@@ -16,6 +21,6 @@ return {
       end,
     })
     vim.o.background = "dark"
-    vim.cmd.colorscheme("token")
+    vim.cmd.colorscheme("token-meridian")
   end,
 }
