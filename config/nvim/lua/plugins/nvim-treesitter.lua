@@ -103,8 +103,8 @@ return {
           if filename ~= "" then
             local ok, stats = pcall(vim.uv.fs_stat, filename)
             if ok and stats then
-              -- Disable for files larger than 100KB
-              if stats.size > 100 * 1024 then
+              -- Disable for files larger than 500KB (prevents lag on huge generated files)
+              if stats.size > 500 * 1024 then
                 return
               end
             end
@@ -114,8 +114,8 @@ return {
           vim.treesitter.start()
 
           -- Enable treesitter folding
-          vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
-          vim.wo[0][0].foldmethod = "expr"
+          vim.wo[0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
+          vim.wo[0].foldmethod = "expr"
         end,
       })
 

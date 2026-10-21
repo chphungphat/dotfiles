@@ -15,7 +15,7 @@ vim.opt.undofile = true
 vim.opt.ignorecase = true
 vim.opt.smartcase = true
 
-vim.opt.signcolumn = "auto"
+vim.opt.signcolumn = "yes"
 
 vim.opt.numberwidth = 4
 
@@ -62,5 +62,14 @@ vim.g.loaded_ruby_provider = 0
 vim.opt.pumheight = 15
 
 vim.opt.regexpengine = 0
+vim.opt.synmaxcol = 300
 
-vim.o.jumpoptions = "view"
+-- Preserve "clean" (removes unloaded buffers from jumplist in monorepos) + "view" (restores cursor view)
+vim.opt.jumpoptions = { "clean", "view" }
+
+-- Monorepo optimizations
+if vim.fn.executable("rg") == 1 then
+  vim.opt.grepprg = "rg --vimgrep --no-heading --smart-case"
+  vim.opt.grepformat = "%f:%l:%c:%m"
+end
+vim.opt.wildignore:append({ "*/node_modules/*", "*/dist/*", "*/.nx/*", "*/.git/*", "*/build/*", "*/coverage/*" })

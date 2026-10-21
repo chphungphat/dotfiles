@@ -1,3 +1,17 @@
+local OXFMT_CONFIG = "oxfmt.config.mts"
+
+-- Where oxfmt runs from: the repo root config for non-code files, else the nearest project's.
+local function oxfmt_root(ctx)
+  local workspace = require("core.workspace")
+  if not ctx.filename:match("%.[cm]?[jt]sx?$") then
+    local repo_root = workspace.repo_dot_configs_root(ctx.filename, OXFMT_CONFIG)
+    if repo_root then
+      return repo_root
+    end
+  end
+  return workspace.dot_configs_root(ctx.filename, OXFMT_CONFIG)
+end
+
 return {
   "stevearc/conform.nvim",
   event = { "BufWritePre" },
@@ -17,16 +31,18 @@ return {
       formatters_by_ft = {
         lua = { "stylua" },
 
-        javascript = { "prettierd" },
-        typescript = { "prettierd" },
-        javascriptreact = { "prettierd" },
-        typescriptreact = { "prettierd" },
-        json = { "prettierd" },
-        jsonc = { "prettierd" },
-        html = { "prettierd" },
-        css = { "prettierd" },
-        scss = { "prettierd" },
-        yaml = { "prettierd" },
+        -- oxfmt where a `.configs/oxfmt.config.mts` governs the file (nx-seller), else prettierd.
+        javascript = { "oxfmt", "prettierd", stop_after_first = true },
+        typescript = { "oxfmt", "prettierd", stop_after_first = true },
+        javascriptreact = { "oxfmt", "prettierd", stop_after_first = true },
+        typescriptreact = { "oxfmt", "prettierd", stop_after_first = true },
+        json = { "oxfmt", "prettierd", stop_after_first = true },
+        jsonc = { "oxfmt", "prettierd", stop_after_first = true },
+        html = { "oxfmt", "prettierd", stop_after_first = true },
+        css = { "oxfmt", "prettierd", stop_after_first = true },
+        scss = { "oxfmt", "prettierd", stop_after_first = true },
+        yaml = { "oxfmt", "prettierd", stop_after_first = true },
+        toml = { "oxfmt" },
         markdown = { "prettierd" },
 
         -- Python
@@ -74,7 +90,7 @@ return {
 
         -- Skip for certain paths
         local bufname = vim.api.nvim_buf_get_name(bufnr)
-        local ignore_patterns = { "/node_modules/", "/%.git/", "/vendor/", "/target/", "/build/" }
+        local ignore_patterns = { "/node_modules/", "/%.git/", "/vendor/", "/target/", "/build/", "/%.nx/", "/dist/", "/coverage/" }
         for _, pattern in ipairs(ignore_patterns) do
           if bufname:match(pattern) then
             return
@@ -89,6 +105,26 @@ return {
       end,
 
       formatters = {
+        -- A project formats its own code with its `.configs/oxfmt.config.mts`; every other file
+        -- (json, yaml, css, html, toml, inside projects too) goes through the repo root's config,
+        -- which keeps package.json key order. Run from that folder, with that project's oxfmt.
+        oxfmt = {
+          inherit = false,
+          command = function(_, ctx)
+            local workspace = require("core.workspace")
+            return workspace.find_node_bin(oxfmt_root(ctx) or ctx.dirname, "oxfmt") or "oxfmt"
+          end,
+          args = { "-c", ".configs/" .. OXFMT_CONFIG, "--stdin-filepath", "$FILENAME" },
+          stdin = true,
+          cwd = function(_, ctx)
+            return oxfmt_root(ctx)
+          end,
+          require_cwd = true,
+          condition = function(_, ctx)
+            return oxfmt_root(ctx) ~= nil
+          end,
+        },
+
         prettierd = {
           command = "prettierd",
           condition = function(_, ctx)

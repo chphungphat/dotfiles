@@ -11,7 +11,7 @@ return {
 			enable_hsl = true,
 			enable_var_usage = true,
 			enable_named_colors = true,
-			enable_tailwind = false,
+			enable_tailwind = true,
 
 			---Set custom colors
 			---Label must be properly escaped with '%' to adhere to `string.gmatch`

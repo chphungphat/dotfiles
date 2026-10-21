@@ -10,5 +10,21 @@ return {
     "astro",
     "vue",
   },
-  opts = {},
+  opts = {
+    enable_on = {
+      "html",
+      "htmldjango",
+      "typescriptreact",
+      "javascriptreact",
+      "svelte",
+      "astro",
+      "vue",
+    },
+    style_sheets = {
+      "./auroras/kits/ui/src/styles/core/utilities.css",
+      "./auroras/kits/ui/src/styles/core/spinner.css",
+      "./auroras/kits/ui/src/styles/core/base.css",
+      "./auroras/kits/ui/src/styles/core/tailwind.css",
+    },
+  },
 }

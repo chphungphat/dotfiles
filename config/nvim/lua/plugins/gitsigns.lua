@@ -20,6 +20,9 @@ return {
         ignore_whitespace = false,
       },
 
+      max_file_length = 40000,
+      update_debounce = 200,
+
       on_attach = function(bufnr)
         local gs = package.loaded.gitsigns
         local map = function(mode, key, cmd, desc)

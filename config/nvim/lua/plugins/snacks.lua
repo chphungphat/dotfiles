@@ -22,6 +22,7 @@ return {
       enabled = true,
       scope = { underline = true },
     },
+    scope = { enabled = true },
     words = { enabled = true },
     input = { enabled = true },
     rename = { enabled = true },
@@ -55,6 +56,15 @@ return {
               },
             },
           },
+        },
+        files = {
+          hidden = true,
+          ignored = false,
+          exclude = { "node_modules", ".git", "dist", ".nx", "coverage", "build" },
+        },
+        grep = {
+          hidden = true,
+          exclude = { "node_modules", ".git", "dist", ".nx", "coverage", "build" },
         },
       },
     },
@@ -128,6 +138,14 @@ return {
       desc = "Search Files",
     },
     {
+      "<leader>sp",
+      function()
+        local root = vim.fs.root(0, { "package.json", "tsconfig.json" })
+        Snacks.picker.files({ cwd = root or vim.fn.expand("%:p:h") })
+      end,
+      desc = "Search Package Files (Monorepo Scope)",
+    },
+    {
       "<leader>sg",
       function()
         Snacks.picker.git_files()
@@ -156,6 +174,14 @@ return {
         Snacks.picker.grep()
       end,
       desc = "Search by Grep",
+    },
+    {
+      "<leader>sP",
+      function()
+        local root = vim.fs.root(0, { "package.json", "tsconfig.json" })
+        Snacks.picker.grep({ cwd = root or vim.fn.expand("%:p:h") })
+      end,
+      desc = "Search Grep in Package (Monorepo Scope)",
     },
     {
       "<leader>sc",

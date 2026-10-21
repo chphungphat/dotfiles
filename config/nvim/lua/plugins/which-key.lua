@@ -17,6 +17,7 @@ return {
       { "<leader>h", group = "help" },
       { "<leader>n", group = "neogen" },
       { "<leader>f", group = "format" },
+      { "<leader>x", group = "trouble" },
 
       -- ] / [ navigation groups (individual bindings already have desc)
       { "]", group = "next" },

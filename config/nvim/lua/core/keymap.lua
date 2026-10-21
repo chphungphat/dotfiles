@@ -13,7 +13,7 @@ vim.keymap.set("n", "<leader>\\", "<C-w>v", { desc = "Split vertical" })
 vim.keymap.set("n", "<ESC>", "<cmd>nohlsearch<CR>")
 
 vim.keymap.set("n", "<leader>cd", vim.diagnostic.open_float, { desc = "Show diagnostic Error messages" })
-vim.keymap.set("n", "<leader>ca", vim.diagnostic.setloclist, { desc = "Open diagnostic Quickfix list" })
+vim.keymap.set("n", "<leader>cl", vim.diagnostic.setloclist, { desc = "Open diagnostic Location list" })
 
 vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
@@ -47,9 +47,24 @@ vim.keymap.set("n", "<leader>lm", "<cmd>messages<CR>", { desc = "Show messages" 
 -- Toggle diagnostic virtual text
 vim.keymap.set("n", "<leader>cv", function()
   local current_config = vim.diagnostic.config()
-  vim.diagnostic.config({
-    virtual_text = not current_config.virtual_text
-  })
-  local status = current_config.virtual_text and "disabled" or "enabled"
-  vim.notify("Diagnostic virtual text " .. status, vim.log.levels.INFO)
+  if current_config.virtual_text then
+    vim.diagnostic.config({ virtual_text = false })
+    vim.notify("Diagnostic virtual text disabled", vim.log.levels.INFO)
+  else
+    vim.diagnostic.config({
+      virtual_text = {
+        spacing = 4,
+        prefix = "●",
+        source = "if_many",
+      },
+    })
+    vim.notify("Diagnostic virtual text enabled", vim.log.levels.INFO)
+  end
 end, { desc = "Toggle diagnostic virtual text" })
+
+-- Toggle LSP inlay hints (Neovim >= 0.10)
+vim.keymap.set("n", "<leader>ci", function()
+  local enabled = vim.lsp.inlay_hint.is_enabled()
+  vim.lsp.inlay_hint.enable(not enabled)
+  vim.notify("LSP inlay hints " .. (enabled and "disabled" or "enabled"), vim.log.levels.INFO)
+end, { desc = "Toggle LSP inlay hints" })
